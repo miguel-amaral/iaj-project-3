@@ -41,11 +41,13 @@ namespace Assets.Scripts.GameManager
         {
             int money = (int)this.GetProperty(Properties.MONEY);
             int HP = (int)this.GetProperty(Properties.HP);
+            float time = (float)this.GetProperty(Properties.TIME);
 
             if (HP <= 0) return 0.0f;
             else if (money == 25)
             {
-                return 1.0f;
+                return 200.0f-time;
+                //return 1.0f;
             }
             else return 0.0f;
         }

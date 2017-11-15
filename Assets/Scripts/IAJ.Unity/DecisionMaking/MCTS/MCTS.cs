@@ -34,8 +34,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 100;
-            this.MaxIterationsProcessedPerFrame = 10;
+            this.MaxIterations = 1000;
+            this.MaxIterationsProcessedPerFrame = 20;
             this.RandomGenerator = new System.Random();
         }
 
@@ -80,9 +80,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (CurrentIterations >= MaxIterations)
             {
                 InProgress = false;
+                printXMLTree(rootNode);
+                return BestChild(rootNode).Action;
             }
-
-            return BestChild(rootNode).Action;
+            return null;
         }
 
         private MCTSNode Selection(MCTSNode initialNode)
@@ -96,9 +97,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null) {
                     return Expand(currentNode, nextAction);
-                } else
-                {
-                    currentNode = BestUCTChild(currentNode);
+                } else {
+                    if (currentNode.ChildNodes.Count == 0) {
+                        string xmlTree = initialNode.ToXML(0);
+                        int numero = initialNode.RecursiveNumberOfChilds();
+                        System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
+                        Debug.Log("Escrita Arvore");
+                        Debug.Log("Arvore nos : " + numero);
+
+                    } else {
+                        currentNode = BestUCTChild(currentNode);
+                    }
                 }
             }
 
@@ -179,6 +188,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 }
             }
             return best;
+        }
+
+        private void printXMLTree(MCTSNode initialNode) {
+            string xmlTree = initialNode.ToXML(0);
+            int numero = initialNode.RecursiveNumberOfChilds();
+            System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
+            Debug.Log("Escrita Arvore");
+            Debug.Log("Arvore nos : " + numero);
         }
     }
 }
