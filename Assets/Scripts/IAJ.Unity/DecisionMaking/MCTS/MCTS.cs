@@ -66,7 +66,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
-            MCTSNode rootNode =  new MCTSNode(CurrentStateWorldModel);
+            MCTSNode rootNode =  new MCTSNode(CurrentStateWorldModel.GenerateChildWorldModel());
 
             while (CurrentIterationsInFrame < MaxIterationsProcessedPerFrame
                 && this.CurrentIterations < this.MaxIterations) {
@@ -96,7 +96,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null) {
                     return Expand(currentNode, nextAction);
-                } else {
+                } else
+                {
                     currentNode = BestUCTChild(currentNode);
                 }
             }
@@ -158,10 +159,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     best = nodeChildNode;
                 }
             }
-            if (best == null)
-            {
-                Debug.Log("LLLL");
-            }
             return best;
         }
 
@@ -180,10 +177,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     bestUCT = firstPart;
                     best = nodeChildNode;
                 }
-            }
-            if (best == null)
-            {
-                Debug.Log("LLLL");
             }
             return best;
         }
