@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -12,6 +13,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public List<MCTSNode> ChildNodes { get; private set; }
         public int N { get; set; }
         public float Q { get; set; }
+
 
         public MCTSNode(WorldModel state)
         {

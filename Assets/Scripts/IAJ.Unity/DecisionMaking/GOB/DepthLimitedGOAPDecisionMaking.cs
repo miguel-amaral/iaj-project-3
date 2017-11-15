@@ -2,11 +2,12 @@
 using Assets.Scripts.GameManager;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS;
 using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
-    public class DepthLimitedGOAPDecisionMaking
+    public class DepthLimitedGOAPDecisionMaking : DecisionMakingBase
     {
         public const int MAX_DEPTH = 4;
         public int ActionCombinationsProcessedPerFrame { get; set; }

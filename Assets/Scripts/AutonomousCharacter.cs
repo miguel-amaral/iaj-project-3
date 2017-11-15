@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 using Assets.Scripts.GameManager;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
@@ -45,7 +46,8 @@ namespace Assets.Scripts
         public List<Action> Actions { get; set; }
         public Action CurrentAction { get; private set; }
         public DynamicCharacter Character { get; private set; }
-        public DepthLimitedGOAPDecisionMaking GOAPDecisionMaking { get; set; }
+        public DecisionMakingBase GOAPDecisionMaking { get; set; }
+
         public AStarPathfinding AStarPathFinding;
         private PathSmoothing pathSmoothing = new PathSmoothing();
         private GoalBoundingTable goalBoundTable;
@@ -88,11 +90,8 @@ namespace Assets.Scripts
        		//use goalBoundingPathfinding for a more efficient algorithm
             goalBoundTable = ScriptableObject.CreateInstance<GoalBoundingTable>();
             goalBoundTable.LoadOptimized();
-            //GoalBoundingPathfinding goalBoundingPathfinding = new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclidianHeuristic(), goalBoundTable);
-            NodeArrayAStarPathFinding goalBoundingPathfinding = new NodeArrayAStarPathFinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclidianHeuristic());     
+            GoalBoundingPathfinding goalBoundingPathfinding = new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclidianHeuristic(), goalBoundTable);
             this.Initialize(NavigationManager.Instance.NavMeshGraphs[0], goalBoundingPathfinding);
-
-            
 
             //initialization of the GOB decision making
             //let's start by creating 4 main goals
@@ -161,7 +160,8 @@ namespace Assets.Scripts
             }
 
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
-            this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
+            this.GOAPDecisionMaking = new MCTS(worldModel);
+            //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }
 
@@ -286,23 +286,23 @@ namespace Assets.Scripts
                 }
             }
 
-            this.TotalProcessingTimeText.text = "Process. Time: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F");
-            this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
-            this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
+            //this.TotalProcessingTimeText.text = "Process. Time: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F");
+            //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
+            //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
 
-            if (this.GOAPDecisionMaking.BestAction != null)
-            {
-                var actionText = "";
-                foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
-                {
-                    actionText += "\n" + action.Name;
-                }
-                this.BestActionText.text = "Best Action Sequence: " + actionText;
-            }
-            else
-            {
-                this.BestActionText.text = "Best Action Sequence:\nNone";
-            }
+            //if (this.GOAPDecisionMaking.BestAction != null)
+            //{
+            //    var actionText = "";
+            //    foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
+            //    {
+            //        actionText += "\n" + action.Name;
+            //    }
+            //    this.BestActionText.text = "Best Action Sequence: " + actionText;
+            //}
+            //else
+            //{
+            //    this.BestActionText.text = "Best Action Sequence:\nNone";
+            //}
         }
 
         public void StartPathfinding(Vector3 targetPosition)
