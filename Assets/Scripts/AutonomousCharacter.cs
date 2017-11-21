@@ -169,7 +169,7 @@ namespace Assets.Scripts
         {
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
-                Debug.Log("Reconsider");
+                Debug.Log("Reconsidering");
                 this.GameManager.WorldChanged = false;
                 this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
 
@@ -217,7 +217,7 @@ namespace Assets.Scripts
 
             if (this.CurrentAction == null)
             {
-                Debug.Log("Action is null");
+                //Debug.Log("Action is null");
             }
             if(this.CurrentAction != null)
             {
@@ -271,23 +271,23 @@ namespace Assets.Scripts
         {
             if (this.GOAPDecisionMaking.InProgress)
             {
-                Debug.Log("GOB in progress");
+                //Debug.Log("GOB in progress");
                 //choose an action using the GOB Decision Making process
                 var action = this.GOAPDecisionMaking.ChooseAction();
                 if (action != null)
                 {
-                    Debug.Log("GOAP action NOT null");
+                    //Debug.Log("GOAP action NOT null");
                     this.CurrentAction = action;
                 }
                 else
                 {
-                    Debug.Log("GOAP action is null");
+                    //Debug.Log("GOAP action is null");
 
                 }
             }
 
-            //this.TotalProcessingTimeText.text = "Process. Time: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F");
-            //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
+            this.TotalProcessingTimeText.text = "Total: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F")
+                                              + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F");//this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
             //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
 
             //if (this.GOAPDecisionMaking.BestAction != null)

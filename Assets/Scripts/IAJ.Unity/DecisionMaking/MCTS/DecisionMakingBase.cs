@@ -8,6 +8,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         GOB.Action[] BestActionSequence { get; }
         bool InProgress { get; }
         float TotalProcessingTime { get; }
+        float ParcialProcessingTime { get; }
+
 
         Action ChooseAction();
         void InitializeDecisionMakingProcess();

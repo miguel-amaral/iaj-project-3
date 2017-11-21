@@ -13,7 +13,8 @@ namespace Assets.Scripts.DecisionMakingActions
 
 		public Fireball(AutonomousCharacter character, GameObject target) : base("Fireball",character,target)
 		{
-		    manaChange = 5;
+            xmlName = "Fire" + target.name;
+            manaChange = 5;
             if (target.tag.Equals("Skeleton"))
 		    {
 		        this.xpChange = 5;

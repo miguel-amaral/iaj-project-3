@@ -4,6 +4,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class Action
     {
+        public string xmlName = "";
         private static int ActionID = 0; 
         public string Name { get; set; }
         public int ID { get; set; }

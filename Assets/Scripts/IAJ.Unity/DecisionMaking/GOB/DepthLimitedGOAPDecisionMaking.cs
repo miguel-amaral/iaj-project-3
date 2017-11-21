@@ -14,6 +14,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         public float TotalProcessingTime { get; set; }
         public int TotalActionCombinationsProcessed { get; set; }
         public bool InProgress { get; set; }
+        public float ParcialProcessingTime { get; private set; }
 
         public CurrentStateWorldModel InitialWorldModel { get; set; }
         private List<Goal> Goals { get; set; }
@@ -47,6 +48,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             this.BestAction = null;
             this.BestDiscontentmentValue = float.MaxValue;
             this.InitialWorldModel.Initialize();
+            this.ParcialProcessingTime = 0;
         }
 
         public Action ChooseAction()
@@ -103,6 +105,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 			
 
 			this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+            this.ParcialProcessingTime = Time.realtimeSinceStartup - startTime;
 			this.InProgress = false;
 			return this.BestAction;
         }

@@ -9,6 +9,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public PickUpChest(AutonomousCharacter character, GameObject target) : base("PickUpChest",character,target)
         {
+            xmlName = target.name;
         }
 
 

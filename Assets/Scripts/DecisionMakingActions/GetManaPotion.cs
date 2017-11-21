@@ -8,6 +8,8 @@ namespace Assets.Scripts.DecisionMakingActions
     {
         public GetManaPotion(AutonomousCharacter character, GameObject target) : base("GetManaPotion",character,target)
         {
+            xmlName = target.name;
+
         }
 
         public override bool CanExecute()

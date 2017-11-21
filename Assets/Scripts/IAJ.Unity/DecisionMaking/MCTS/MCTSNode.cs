@@ -31,9 +31,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             string toReturn = tabSpaces + "<Node>";
             if(this.Action != null) {
-                toReturn += tabSpaces + " <Action> " + this.Action.Name+ " </Action>";
+                toReturn += tabSpaces + " <Action> " + this.Action.xmlName+ " </Action>";
             }
-            toReturn += tabSpaces + " <Q_N_div> " + Q + " " + N + " " + N / Q + " </Q_N_div>";
+            toReturn += tabSpaces + " <N>" +(int)N +"</N>";
+            toReturn += tabSpaces + " <Q>" + (int)Q + "</Q>";
+            toReturn += tabSpaces + " <Q_N_div>"+ (int)(Q / N) + "</Q_N_div>";
             //if (ChildNodes.Count > 0) {
             //    toReturn += tabSpaces + " <Number_Childs> " + ChildNodes.Count + " </Number_Childs>";
             //}

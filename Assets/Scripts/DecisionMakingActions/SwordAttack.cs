@@ -11,7 +11,9 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public SwordAttack(AutonomousCharacter character, GameObject target) : base("SwordAttack",character,target)
         {
-           
+            xmlName = "Sword " + target.name;
+
+
             if (target.tag.Equals("Skeleton"))
             {
                 this.hpChange = -2;

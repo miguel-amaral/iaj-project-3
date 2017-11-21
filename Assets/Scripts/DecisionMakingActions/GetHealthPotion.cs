@@ -9,9 +9,11 @@ namespace Assets.Scripts.DecisionMakingActions
     {
         public GetHealthPotion(AutonomousCharacter character, GameObject target) : base("GetHealthPotion",character,target)
         {
+            xmlName = target.name;
+
         }
 
-		public override bool CanExecute()
+        public override bool CanExecute()
 		{
 		    if (!base.CanExecute()) return false;
 		    return this.Character.GameManager.characterData.HP < this.Character.GameManager.characterData.MaxHP;

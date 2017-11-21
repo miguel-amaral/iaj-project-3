@@ -16,6 +16,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
+        public float ParcialProcessingTime { get; private set; }
+        
+        
         public MCTSNode BestFirstChild { get; set; }
         public GOB.Action[] BestActionSequence { get; private set; }
 
@@ -27,16 +30,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
         private System.Random RandomGenerator { get; set; }
-        
-        
+
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 1000;
-            this.MaxIterationsProcessedPerFrame = 20;
+            this.MaxIterations = 10000;
+            this.MaxIterationsProcessedPerFrame = 1000;
             this.RandomGenerator = new System.Random();
+            this.TotalProcessingTime = 0;
         }
 
 
@@ -46,7 +49,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxSelectionDepthReached = 0;
             this.CurrentIterations = 0;
             this.CurrentIterationsInFrame = 0;
-            this.TotalProcessingTime = 0.0f;
+            this.CurrentIterationsInFrame = 0;
             this.CurrentStateWorldModel.Initialize();
             this.InitialNode = new MCTSNode(this.CurrentStateWorldModel)
             {
@@ -56,15 +59,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             };
             this.InProgress = true;
             this.BestFirstChild = null;
-           // this.BestActionSequence = new List<GOB.Action>();
+            this.ParcialProcessingTime = 0;
+            // this.BestActionSequence = new List<GOB.Action>();
         }
 
         public GOB.Action ChooseAction()
         {
+            var frameBegin  = Time.realtimeSinceStartup;
+            
             MCTSNode selectedNode;
             Reward reward;
 
-            var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
             MCTSNode rootNode =  new MCTSNode(CurrentStateWorldModel.GenerateChildWorldModel());
 
@@ -76,7 +81,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 CurrentIterations++;
                 CurrentIterationsInFrame++;
             }
+            var frameEnd = Time.realtimeSinceStartup;
+            var thisFrameTime = frameEnd - frameBegin;
 
+            TotalProcessingTime += thisFrameTime;
+            ParcialProcessingTime += thisFrameTime;
             if (CurrentIterations >= MaxIterations)
             {
                 InProgress = false;
@@ -191,6 +200,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         private void printXMLTree(MCTSNode initialNode) {
+            //Guid uid = Guid.NewGuid();
             string xmlTree = initialNode.ToXML(0);
             int numero = initialNode.RecursiveNumberOfChilds();
             System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
