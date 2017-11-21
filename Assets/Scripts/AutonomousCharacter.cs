@@ -80,7 +80,6 @@ namespace Assets.Scripts
 
         public void Start()
         {
-            Debug.Log("batata");
             this.draw = true;
 
             this.navMesh = NavigationManager.Instance.NavMeshGraphs[0];
@@ -160,7 +159,8 @@ namespace Assets.Scripts
             }
 
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
-            this.GOAPDecisionMaking = new MCTS(worldModel);
+            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }

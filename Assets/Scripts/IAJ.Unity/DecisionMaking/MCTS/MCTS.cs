@@ -97,7 +97,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 while (bestChild != null)
                 {
                     temp.Add(bestChild.Action);
-                    bestChild = BestChild(currNode);
+                    bestChild = BestChild(bestChild);
                 }
                 this.BestActionSequence = temp.ToArray();
                 this.BestAction = BestChild(rootNode).Action;
@@ -137,10 +137,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(WorldModel currentPlayoutState) {
             while (!currentPlayoutState.IsTerminal()) {
-                int count = currentPlayoutState.GetExecutableActions().Length;
-                var action = currentPlayoutState.GetExecutableActions()[RandomGenerator.Next(count)];
+                var action = GuidedAction(currentPlayoutState);
                 var childModel = currentPlayoutState.GenerateChildWorldModel();
                 action.ApplyActionEffects(childModel);
+                childModel.CalculateNextPlayer();
                 currentPlayoutState = childModel;
             }
             return new Reward
@@ -149,6 +149,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 Value = currentPlayoutState.GetScore()
             };
         }
+
+        protected virtual Action GuidedAction(WorldModel currentPlayoutState)
+        {
+            return currentPlayoutState.GetExecutableActions()
+                [RandomGenerator.Next(currentPlayoutState.GetExecutableActions().Length)];
+        }
+
         private void Backpropagate(MCTSNode node, Reward reward)
         {
             while(node != null) {
@@ -162,9 +169,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             WorldModel childModel = parent.State.GenerateChildWorldModel();
             action.ApplyActionEffects(childModel);
+            childModel.CalculateNextPlayer();
             MCTSNode child = new MCTSNode(childModel) {
                 Parent = parent,
-                PlayerID = parent.PlayerID,
+                PlayerID = childModel.GetNextPlayer(),
                 Action = action,
                 N = 0,
                 Q = 0f,

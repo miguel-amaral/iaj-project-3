@@ -26,8 +26,9 @@ namespace Assets.Scripts.DecisionMakingActions
 		    }
 		    else if (target.tag.Equals("Dragon"))
 		    {
-		        this.xpChange = 15;
-		    }
+		        this.xpChange = 0;
+                //this.xpChange = 20;
+            }
         }
 
 		public override float GetGoalChange(Goal goal)
@@ -69,10 +70,10 @@ namespace Assets.Scripts.DecisionMakingActions
 		    var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_XP_GOAL);
 		    worldModel.SetGoalValue(AutonomousCharacter.GAIN_XP_GOAL, xpValue - this.xpChange);
 
-		    var xp = (int)worldModel.GetProperty(Properties.XP);
+		    var xp = (int) worldModel.GetProperty(Properties.XP);
 		    worldModel.SetProperty(Properties.XP, xp + this.xpChange);
 
-		    var mp = (int) worldModel.GetProperty(Properties.MANA);
+            var mp = (int) worldModel.GetProperty(Properties.MANA);
             worldModel.SetProperty(Properties.MANA, mp-manaChange);
 
 

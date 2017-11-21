@@ -16,18 +16,18 @@ namespace Assets.Scripts.DecisionMakingActions
 
             if (target.tag.Equals("Skeleton"))
             {
-                this.hpChange = -2;
+                this.hpChange = -5;
                 this.xpChange = 5;
             }
             else if (target.tag.Equals("Orc"))
             {
-                this.hpChange = -5;
+                this.hpChange = -10;
                 this.xpChange = 10;
             }
             else if (target.tag.Equals("Dragon"))
             {
-                this.hpChange = -10;
-                this.xpChange = 15;
+                this.hpChange = -20;
+                this.xpChange = 20;
             }
         }
 
