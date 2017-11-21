@@ -10,6 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         float TotalProcessingTime { get; }
         float ParcialProcessingTime { get; }
 
+        GOB.Action BestAction { get; }
 
         Action ChooseAction();
         void InitializeDecisionMakingProcess();

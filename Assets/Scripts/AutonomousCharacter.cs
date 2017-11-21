@@ -290,19 +290,19 @@ namespace Assets.Scripts
                                               + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F");//this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
             //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
 
-            //if (this.GOAPDecisionMaking.BestAction != null)
-            //{
-            //    var actionText = "";
-            //    foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
-            //    {
-            //        actionText += "\n" + action.Name;
-            //    }
-            //    this.BestActionText.text = "Best Action Sequence: " + actionText;
-            //}
-            //else
-            //{
-            //    this.BestActionText.text = "Best Action Sequence:\nNone";
-            //}
+            if (this.GOAPDecisionMaking.BestAction != null)
+            {
+                var actionText = "";
+                foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
+                {
+                    actionText += "\n" + action.Name;
+                }
+                this.BestActionText.text = "Best Action Sequence: " + actionText;
+            }
+            else
+            {
+                this.BestActionText.text = "Best Action Sequence:\nNone";
+            }
         }
 
         public void StartPathfinding(Vector3 targetPosition)

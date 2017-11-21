@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
+using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -18,10 +19,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public float TotalProcessingTime { get; private set; }
         public float ParcialProcessingTime { get; private set; }
         
-        
         public MCTSNode BestFirstChild { get; set; }
         public GOB.Action[] BestActionSequence { get; private set; }
-
+        public GOB.Action BestAction { get; private set; }
 
         private int CurrentIterations { get; set; }
         private int CurrentIterationsInFrame { get; set; }
@@ -37,7 +37,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
             this.MaxIterations = 10000;
-            this.MaxIterationsProcessedPerFrame = 1000;
+            this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
         }
@@ -90,7 +90,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 InProgress = false;
                 printXMLTree(rootNode);
-                return BestChild(rootNode).Action;
+
+                List<GOB.Action> temp = new List<GOB.Action>();
+                var currNode = rootNode;
+                var bestChild = BestChild(currNode); 
+                while (bestChild != null)
+                {
+                    temp.Add(bestChild.Action);
+                    bestChild = BestChild(currNode);
+                }
+                this.BestActionSequence = temp.ToArray();
+                this.BestAction = BestChild(rootNode).Action;
+                return BestAction;
             }
             return null;
         }
@@ -107,13 +118,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (nextAction != null) {
                     return Expand(currentNode, nextAction);
                 } else {
+                    
                     if (currentNode.ChildNodes.Count == 0) {
+                        //DEBUG CODE
                         string xmlTree = initialNode.ToXML(0);
                         int numero = initialNode.RecursiveNumberOfChilds();
                         System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
                         Debug.Log("Escrita Arvore");
                         Debug.Log("Arvore nos : " + numero);
-
                     } else {
                         currentNode = BestUCTChild(currentNode);
                     }
