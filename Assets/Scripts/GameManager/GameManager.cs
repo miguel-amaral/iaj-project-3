@@ -92,7 +92,6 @@ namespace Assets.Scripts.GameManager
                 }
             }
 
-
             this.HPText.text = "HP: " + this.characterData.HP;
             this.XPText.text = "XP: " + this.characterData.XP;
             this.LevelText.text = "Level: " + this.characterData.Level;

@@ -34,16 +34,23 @@ namespace Assets.Scripts.GameManager
             float time = (float)this.GetProperty(Properties.TIME);
             int money = (int)this.GetProperty(Properties.MONEY);
 
-            return HP <= 0 ||  time >= 200 || money == 25;
+            return (this.NextPlayer == 0) && (HP <= 0 ||  time >= 200 || money == 25);
         }
 
         public override float GetScore()
         {
             int money = (int)this.GetProperty(Properties.MONEY);
+            int hp = (int) GetProperty(Properties.HP);
+            int mhp = (int) GetProperty(Properties.MAXHP);
+            float time = (float)this.GetProperty(Properties.TIME);
 
-            if (money == 25)
+            if (money == 25 && hp > 0)
             {
-                return 1.0f;
+                return 200 - time + 200; //0.5f + 0.0025f * (200 -time);
+            }
+            if (money > 0)
+            {
+                return 2 * money + 0.25f * time;
             }
             else return 0.0f;
         }

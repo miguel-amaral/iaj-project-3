@@ -36,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 10000;
+            this.MaxIterations = 30000;
             this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
@@ -141,6 +141,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 var childModel = currentPlayoutState.GenerateChildWorldModel();
                 action.ApplyActionEffects(childModel);
                 childModel.CalculateNextPlayer();
+                //if (childModel.GetNextPlayer() == 2)
+                //{
+                //    Debug.Log("pls autista");
+                //}
                 currentPlayoutState = childModel;
             }
             return new Reward
@@ -224,8 +228,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             string xmlTree = initialNode.ToXML(0);
             int numero = initialNode.RecursiveNumberOfChilds();
             System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
-            Debug.Log("Escrita Arvore");
-            Debug.Log("Arvore nos : " + numero);
+            //Debug.Log("Escrita Arvore");
+            //Debug.Log("Arvore nos : " + numero);
         }
     }
 }

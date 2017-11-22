@@ -157,10 +157,10 @@ namespace Assets.Scripts
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
-
+            this.Actions.Add(new LevelUp(this));
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
-            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
-            //this.GOAPDecisionMaking = new MCTS(worldModel);
+            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }

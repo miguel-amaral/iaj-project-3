@@ -76,10 +76,12 @@ namespace Assets.Scripts.DecisionMakingActions
             var mp = (int) worldModel.GetProperty(Properties.MANA);
             worldModel.SetProperty(Properties.MANA, mp-manaChange);
 
-
-		    //disables the target object so that it can't be reused again
-		    worldModel.SetProperty(this.Target.name, false);
-        }
+		    if (!this.Target.CompareTag("Dragon"))
+		    {
+		        //disables the target object so that it can't be reused again
+		        worldModel.SetProperty(this.Target.name, false);
+		    }
+		}
 
     }
 }
