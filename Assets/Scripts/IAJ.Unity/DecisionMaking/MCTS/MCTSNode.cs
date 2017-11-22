@@ -24,6 +24,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public string ToXML(int depth) {
 
+            //if (ChildNodes.Count > 0) {
+            //    toReturn += tabSpaces + " <Number_Childs> " + ChildNodes.Count + " </Number_Childs>";
+            //}
             string tabSpaces = "\n";
             for(int i = 0; i < depth; i++) {
                 tabSpaces += " ";
@@ -36,9 +39,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             toReturn += tabSpaces + " <N>" +(int)N +"</N>";
             toReturn += tabSpaces + " <Q>" + (int)Q + "</Q>";
             toReturn += tabSpaces + " <Q_N_div>"+ (Q / N) + "</Q_N_div>";
-            //if (ChildNodes.Count > 0) {
-            //    toReturn += tabSpaces + " <Number_Childs> " + ChildNodes.Count + " </Number_Childs>";
-            //}
+            toReturn += tabSpaces + " <Terminal>"+ State.IsTerminal() + "</Terminal>";
+            if(this.Parent != null) {
+
+            var firstPart = this.Q / this.N;
+            var secondPart = 1.4f * 400 * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
+            toReturn += tabSpaces + " <BestUTC>"+ (firstPart + secondPart)+ "</BestUTC>";
+            } else {
+                toReturn += tabSpaces + " <BestUTC>" + 0 + "</BestUTC>";
+            }
             foreach (var node in ChildNodes) {
                 toReturn += node.ToXML(depth + 1);
             }

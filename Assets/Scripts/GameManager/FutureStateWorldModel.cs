@@ -46,7 +46,7 @@ namespace Assets.Scripts.GameManager
 
             if (money == 25 && hp > 0)
             {
-                return 200 - time + 200; //0.5f + 0.0025f * (200 -time);
+                return 200 - (time > 200 ? 200 : time) + 200; //0.5f + 0.0025f * (200 -time);
             }
             if (money > 0)
             {

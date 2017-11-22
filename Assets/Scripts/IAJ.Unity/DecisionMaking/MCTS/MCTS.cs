@@ -10,7 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTS : DecisionMakingBase
     {
-        public const float C = 1.4f;
+        public const float C = 1.4f * 400;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
@@ -36,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 30000;
+            this.MaxIterations = 10000;
             this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
@@ -71,7 +71,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             Reward reward;
 
             this.CurrentIterationsInFrame = 0;
-            MCTSNode rootNode =  new MCTSNode(CurrentStateWorldModel.GenerateChildWorldModel());
+            MCTSNode rootNode = InitialNode;
+            //MCTSNode rootNode =  new MCTSNode(CurrentStateWorldModel.GenerateChildWorldModel());
 
             while (CurrentIterationsInFrame < MaxIterationsProcessedPerFrame
                 && this.CurrentIterations < this.MaxIterations) {
@@ -116,6 +117,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null) {
+                    if(currentNode.Parent != null && currentNode.Parent.Parent == null) {
+                        Debug.Log("" +currentNode.State.GetProperty(Properties.HP)+ "  :  "+ currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
+                       
+                    }
                     return Expand(currentNode, nextAction);
                 } else {
                     
@@ -141,10 +146,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 var childModel = currentPlayoutState.GenerateChildWorldModel();
                 action.ApplyActionEffects(childModel);
                 childModel.CalculateNextPlayer();
-                //if (childModel.GetNextPlayer() == 2)
-                //{
-                //    Debug.Log("pls autista");
-                //}
                 currentPlayoutState = childModel;
             }
             return new Reward
@@ -156,8 +157,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected virtual Action GuidedAction(WorldModel currentPlayoutState)
         {
-            return currentPlayoutState.GetExecutableActions()
-                [RandomGenerator.Next(currentPlayoutState.GetExecutableActions().Length)];
+            var number = RandomGenerator.Next(currentPlayoutState.GetExecutableActions().Length);
+            return currentPlayoutState.GetExecutableActions()[number];
         }
 
         private void Backpropagate(MCTSNode node, Reward reward)
@@ -195,7 +196,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 var firstPart = nodeChildNode.Q / nodeChildNode.N;
                 var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
                 var sum = firstPart + secondPart;
-                if (bestUCT < firstPart + secondPart)
+                if (sum > bestUCT)
                 {
                     bestUCT = sum;
                     best = nodeChildNode;
@@ -229,7 +230,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             int numero = initialNode.RecursiveNumberOfChilds();
             System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
             //Debug.Log("Escrita Arvore");
-            //Debug.Log("Arvore nos : " + numero);
+            Debug.Log("Arvore nos : " + numero);
         }
     }
 }
