@@ -49,9 +49,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxSelectionDepthReached = 0;
             this.CurrentIterations = 0;
             this.CurrentIterationsInFrame = 0;
-            this.CurrentIterationsInFrame = 0;
             this.CurrentStateWorldModel.Initialize();
-            this.InitialNode = new MCTSNode(this.CurrentStateWorldModel)
+            this.InitialNode = new MCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel())
             {
                 Action = null,
                 Parent = null,
@@ -117,10 +116,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null) {
-                    if(currentNode.Parent != null && currentNode.Parent.Parent == null) {
-                        Debug.Log("" +currentNode.State.GetProperty(Properties.HP)+ "  :  "+ currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
-                       
-                    }
+                    //if (currentNode.Parent != null && currentNode.Parent.Parent == null) {
+                    //    Debug.Log("" + currentNode.State.GetProperty(Properties.HP) + "  :  " + currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
+                    //}
+                    //if (currentNode.Parent == null ) {
+                    //    Debug.Log("" + currentNode.State.GetProperty(Properties.HP) + "  :  " + currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
+                    //}
                     return Expand(currentNode, nextAction);
                 } else {
                     

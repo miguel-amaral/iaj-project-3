@@ -1,0 +1,25 @@
+﻿<Window x:Class="GrarphTutorial.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GrarphTutorial"
+        mc:Ignorable="d"
+		xmlns:zoom="clr-namespace:WPFExtensions.Controls;assembly=WPFExtensions"
+		xmlns:graphsharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+        Title="MainWindow" 
+		Height="350" 
+		Width="525"
+		x:Name="root"
+		>
+    <Grid>
+		<zoom:ZoomControl>
+			<graphsharp:GraphLayout x:Name="graphLayout"
+								Graph="{Binding ElementName=root,Path=GraphToVisualize}" 
+								LayoutAlgorithmType="FR"
+								OverlapRemovalAlgorithmType="FSA"
+								HighlightAlgorithmType="Simple"
+								/>
+		</zoom:ZoomControl>
+	</Grid>
+</Window>

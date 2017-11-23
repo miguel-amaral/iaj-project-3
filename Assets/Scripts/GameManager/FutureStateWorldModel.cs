@@ -50,7 +50,7 @@ namespace Assets.Scripts.GameManager
             }
             if (money > 0)
             {
-                return 2 * money + 0.25f * time;
+                return 1 * money + 2*0.25f * time;
             }
             else return 0.0f;
         }
