@@ -4,30 +4,19 @@ using UnityEngine;
 
 public class FollowPlayer : MonoBehaviour {
 
-    public Transform target;
+    public Transform Target;
 
-    public float smoothSpeed = 0.125f;
-    public Vector3 offset;
+    public float SmoothSpeed = 1f;
+    public float Offset;
+    public Vector3 RelativePosition;
 
     void FixedUpdate()
     {
-        var desiredPos = target.position + offset;
-        var smoothPos = Vector3.Lerp(transform.position, desiredPos, smoothSpeed);
+        var desiredPos = Target.position + -Target.transform.forward * Offset + RelativePosition;
+        var smoothPos = Vector3.Lerp(transform.position, desiredPos, SmoothSpeed);
         transform.position = smoothPos;
 
-        transform.LookAt(target);
+        transform.LookAt(Target);
     }
 
-
-    // Use this for initialization
- //   void Start ()
- //   {
- //       target = GameObject.FindGameObjectWithTag("Player").transform;
- //       offset = new Vector3(-3 , 3 , 0);
- //   }
-	
-	//// Update is called once per frame
-	//void Update () {
-	//    transform.position = target.position + offset;
- //   }
 }
