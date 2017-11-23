@@ -72,6 +72,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name,false);
+            
         }
 
     }

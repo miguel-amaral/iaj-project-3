@@ -50,7 +50,10 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override bool CanExecute(WorldModel worldModel)
         {
-            if (this.Target == null) return false;
+            if (this.Target == null) {
+                Debug.Log("xD");
+                return false;
+            }
             var targetEnabled = (bool)worldModel.GetProperty(this.Target.name);
             return targetEnabled;
         }
