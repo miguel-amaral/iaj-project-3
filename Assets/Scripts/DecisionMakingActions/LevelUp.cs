@@ -18,9 +18,18 @@ namespace Assets.Scripts.DecisionMakingActions
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
 
-            worldModel.SetProperty(Properties.LEVEL, level + 1);
-            worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
-            worldModel.SetProperty(Properties.HP, maxHP + 10);
+            //worldModel.SetProperty(Properties.LEVEL, level + 1);
+            //worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
+            //worldModel.SetProperty(Properties.HP, maxHP + 10);
+            if(level == 1) {
+                worldModel.SetProperty(Properties.LEVEL, 2);
+                worldModel.SetProperty(Properties.MAXHP, 20);
+                worldModel.SetProperty(Properties.HP, 20);
+            }else if (level == 2) {
+                worldModel.SetProperty(Properties.LEVEL, 3);
+                worldModel.SetProperty(Properties.MAXHP, 30);
+                worldModel.SetProperty(Properties.HP, 30);
+            }
         }
 
         public override bool CanExecute()

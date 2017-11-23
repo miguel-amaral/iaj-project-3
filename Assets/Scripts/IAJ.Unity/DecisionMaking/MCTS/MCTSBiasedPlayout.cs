@@ -4,6 +4,7 @@ using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using UnityEngine;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -26,36 +27,57 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected override Action GuidedAction(WorldModel currentPlayoutState)
         {
             //var originalWorldModel = currentPlayoutState;
-            Action bestOverallAction = null;
-            var bestHeuristicValue = int.MinValue;
+            List<Action> bestOverallAction = new List<GOB.Action>();
+            List<int> weights = new List<int>();
+            var ola = currentPlayoutState as FutureStateWorldModel;
+            GameManager.GameManager gameManager = null;
+            if(ola == null) {
+                Debug.Log("Aspergers, mctsBiasedPlayout");
+                return null;
+            } else {
+                gameManager = ola.GameManager;
+            }
+
+            //precaution
+            if (currentPlayoutState.GetExecutableActions() == null) {
+                return null;
+            }
+
+            var mana = (int)currentPlayoutState.GetProperty(Properties.MANA);
 
             foreach (var executableAction in currentPlayoutState.GetExecutableActions())
             {
-                var childWorldModel = currentPlayoutState.GenerateChildWorldModel();
-                executableAction.ApplyActionEffects(childWorldModel);
-                childWorldModel.CalculateNextPlayer();
-
-
-
-                var sum = LevelWeight * (int) childWorldModel.GetProperty(Properties.XP);
-                if (childWorldModel.GetNextPlayer() == 1)
-                {
-                    sum += 0;
-                }
-                else
-                {
-                    sum += 4000;
+                
+                var sum = 5;
+                //if(executableAction)
+                if(gameManager.enemies.Count == 0) { 
+                    if(!(executableAction.Name.StartsWith("GetHealthPotion") || executableAction.Name.StartsWith("GetManaPotion"))) {
+                        sum += 20;
+                    }
+                }else if(mana > 5) {
+                    if (executableAction.Name.StartsWith("Fire")){
+                        sum += 40;
+                    }
                 }
 
-                if (sum > bestHeuristicValue)
-                {
-                    bestHeuristicValue = sum;
-                    bestOverallAction = executableAction;
+
+                bestOverallAction.Add(executableAction);
+                if(weights.Count > 0) {
+                    weights.Add(weights[weights.Count - 1] + sum);
+                } else {
+                    weights.Add(sum);
                 }
 
             }
-
-            return bestOverallAction;
+   
+            var bestValue = this.RandomGenerator.Next(weights[weights.Count - 1]);
+            for(int i =0; i< weights.Count; i++) {
+                if (bestValue < weights[i]) {
+                    return bestOverallAction[i];
+                }
+            }
+            return null;
+            //return bestOverallAction[this.RandomGenerator.Next(bestOverallAction.Count)];
         }
         //protected override Action GuidedAction(WorldModel currentPlayoutState)
         //{

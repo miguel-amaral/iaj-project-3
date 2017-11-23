@@ -10,7 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTS : DecisionMakingBase
     {
-        public const float C = 1.4f * 400;
+        public const float C = 1.4f * 1200;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
@@ -29,14 +29,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
-        private System.Random RandomGenerator { get; set; }
+        protected System.Random RandomGenerator { get; set; }
 
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 10000;
+            this.MaxIterations = 30000;
             this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;

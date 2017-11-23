@@ -7,7 +7,7 @@ namespace Assets.Scripts.GameManager
 {
     public class FutureStateWorldModel : WorldModel
     {
-        protected GameManager GameManager { get; set; }
+        public GameManager GameManager { get; protected set; }
         protected int NextPlayer { get; set; }
         protected Action NextEnemyAction { get; set; }
         protected Action[] NextEnemyActions { get; set; }
@@ -44,15 +44,19 @@ namespace Assets.Scripts.GameManager
             int mhp = (int) GetProperty(Properties.MAXHP);
             float time = (float)this.GetProperty(Properties.TIME);
 
-            if (money == 25 && hp > 0)
-            {
-                return 200 - (time > 200 ? 200 : time) + 200; //0.5f + 0.0025f * (200 -time);
+            if (money == 25 && hp > 0) {
+                //Debug.Log("Ganhei");
+                return 200 - (time > 200 ? 200 : time) + 1000; //0.5f + 0.0025f * (200 -time);
+            } else if (money == 0 && time > 200) {
+                return 0;
+            } else { 
+                return 1 * money + 3 * 0.25f * time;
             }
-            if (money > 0)
-            {
-                return 1 * money + 2*0.25f * time;
-            }
-            else return 0.0f;
+            //if (money > 0)
+            //{
+                
+            //}
+            //else return 0.0f;
         }
 
         public override int GetNextPlayer()

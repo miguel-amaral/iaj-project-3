@@ -9,7 +9,7 @@ namespace Assets.Scripts.DecisionMakingActions
     {
         protected AutonomousCharacter Character { get; set; }
 
-        protected GameObject Target { get; set; }
+        public GameObject Target { get; protected set; }
 
         protected WalkToTargetAndExecuteAction(string actionName, AutonomousCharacter character, GameObject target) : base(actionName + "(" + target.name + ")")
         {
@@ -73,5 +73,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
             worldModel.SetProperty(Properties.POSITION, Target.transform.position);
         }
+
+
     }
 }

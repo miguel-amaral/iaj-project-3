@@ -65,8 +65,7 @@ namespace Assets.Scripts
         private Vector3 previousTarget;
 
 		private Animator characterAnimator;
-
-
+        private bool alreadyCalculatedNextReconsider;
 
         public void Initialize(NavMeshPathGraph navMeshGraph, AStarPathfinding pathfindingAlgorithm)
         {
@@ -159,19 +158,21 @@ namespace Assets.Scripts
             }
             this.Actions.Add(new LevelUp(this));
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
-            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
-            this.GOAPDecisionMaking = new MCTS(worldModel);
+            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }
 
         void Update()
         {
+           
+
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
                 Debug.Log("Reconsidering");
                 this.GameManager.WorldChanged = false;
-                this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
+                //this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
 
                 //first step, perceptions
                 //update the agent's goals based on the state of the world
@@ -210,6 +211,7 @@ namespace Assets.Scripts
                 //initialize Decision Making Proccess
                 this.CurrentAction = null;
                 this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
+                previousTarget = new Vector3(0,0,0);
             }
 
             
@@ -284,6 +286,8 @@ namespace Assets.Scripts
                     //Debug.Log("GOAP action is null");
 
                 }
+                //alreadyCalculatedNextReconsider = false;
+                this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
             }
 
             this.TotalProcessingTimeText.text = "Total: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F")
@@ -310,8 +314,9 @@ namespace Assets.Scripts
             //if the targetPosition received is the same as a previous target, then this a request for the same target
             //no need to redo the pathfinding search
 
-            if (!this.previousTarget.Equals(targetPosition))
+            if (!this.previousTarget.Equals(targetPosition) || this.GameManager.WorldChanged)
             {
+                Debug.Log("Entrei start pathfinding if");
                 this.AStarPathFinding.InitializePathfindingSearch(this.Character.KinematicData.position, targetPosition);
                 this.previousTarget = targetPosition;
             }
@@ -337,6 +342,14 @@ namespace Assets.Scripts
 						Debug.DrawLine(previousPosition, pathPosition, Color.green);
 						previousPosition = pathPosition;
 					}
+                    var walk = this.CurrentAction as WalkToTargetAndExecuteAction;
+                    if (walk != null) {
+                        Gizmos.color = Color.black;
+                        Gizmos.DrawWireSphere(walk.Target.transform.position, 3.0F);
+                    }
+                    Gizmos.color = Color.cyan;
+                    Gizmos.DrawWireSphere(this.AStarPathFinding.GoalPosition, 3.0F);
+                    
 				}
 			}
 		}

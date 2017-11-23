@@ -16,8 +16,8 @@ namespace Assets.Scripts.GameManager
         public CharacterData(GameObject gameObject)
         {
             this.CharacterGameObject = gameObject;
-            this.HP = 10;
             this.MaxHP = 10;
+            this.HP = MaxHP;
             this.Mana = 0;
             this.Money = 0;
             this.Time = 0;
