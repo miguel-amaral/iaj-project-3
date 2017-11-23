@@ -39,26 +39,33 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
 
             //precaution
-            if (currentPlayoutState.GetExecutableActions() == null) {
-                return null;
-            }
+            
 
             var mana = (int)currentPlayoutState.GetProperty(Properties.MANA);
+            var hp = (int)currentPlayoutState.GetProperty(Properties.HP);
 
             foreach (var executableAction in currentPlayoutState.GetExecutableActions())
             {
+                //apply to get next state and check who is next player (maybe)
+                //trully fucking expensive    
+                
                 
                 var sum = 5;
                 //if(executableAction)
-                if(gameManager.enemies.Count == 0) { 
-                    if(!(executableAction.Name.StartsWith("GetHealthPotion") || executableAction.Name.StartsWith("GetManaPotion"))) {
-                        sum += 20;
+                if(gameManager.enemies.Count == 0) {
+                    if((executableAction.Name.StartsWith("GetHealthPotion") || executableAction.Name.StartsWith("GetManaPotion"))) {
+                        continue;
                     }
                 }else if(mana > 5) {
                     if (executableAction.Name.StartsWith("Fire")){
                         sum += 40;
                     }
                 }
+
+                if(hp <= 5 && executableAction.Name.StartsWith("Sword")) {
+                    continue;
+                }
+
 
 
                 bestOverallAction.Add(executableAction);
@@ -69,7 +76,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 }
 
             }
-   
+            if (bestOverallAction.Count == 0) {
+                return null;
+            }
             var bestValue = this.RandomGenerator.Next(weights[weights.Count - 1]);
             for(int i =0; i< weights.Count; i++) {
                 if (bestValue < weights[i]) {

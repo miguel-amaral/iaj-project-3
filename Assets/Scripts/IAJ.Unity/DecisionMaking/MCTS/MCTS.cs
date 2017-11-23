@@ -36,7 +36,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 30000;
+            this.MaxIterations = 40000;
             this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
@@ -45,6 +45,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public void InitializeDecisionMakingProcess()
         {
+            foreach( var a in this.CurrentStateWorldModel.GetExecutableActions()) {
+                Debug.Log(a);
+            }
+            
+
             this.MaxPlayoutDepthReached = 0;
             this.MaxSelectionDepthReached = 0;
             this.CurrentIterations = 0;
@@ -124,12 +129,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 nextAction = currentNode.State.GetNextAction();
                 if (nextAction != null) {
-                    //if (currentNode.Parent != null && currentNode.Parent.Parent == null) {
-                    //    Debug.Log("" + currentNode.State.GetProperty(Properties.HP) + "  :  " + currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
-                    //}
-                    //if (currentNode.Parent == null ) {
-                    //    Debug.Log("" + currentNode.State.GetProperty(Properties.HP) + "  :  " + currentNode.State.GetProperty(Properties.MAXHP) + "  :  " + currentNode.Action);
-                    //}
                     return Expand(currentNode, nextAction);
                 } else {
                     
@@ -152,6 +151,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private Reward Playout(WorldModel currentPlayoutState) {
             while (!currentPlayoutState.IsTerminal()) {
                 var action = GuidedAction(currentPlayoutState);
+                if(action == null) {
+                    return new Reward {
+                        PlayerID = currentPlayoutState.GetNextPlayer(),
+                        Value = 0
+                    };
+                }
                 var childModel = currentPlayoutState.GenerateChildWorldModel();
                 action.ApplyActionEffects(childModel);
                 childModel.CalculateNextPlayer();
