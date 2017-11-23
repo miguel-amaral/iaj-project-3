@@ -166,8 +166,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected virtual Action GuidedAction(WorldModel currentPlayoutState)
         {
-            var number = RandomGenerator.Next(currentPlayoutState.GetExecutableActions().Length);
-            return currentPlayoutState.GetExecutableActions()[number];
+            var possibleActions = currentPlayoutState.GetExecutableActions();
+
+            var number = RandomGenerator.Next(possibleActions.Length);
+            return possibleActions[number];
         }
 
         private void Backpropagate(MCTSNode node, Reward reward)
