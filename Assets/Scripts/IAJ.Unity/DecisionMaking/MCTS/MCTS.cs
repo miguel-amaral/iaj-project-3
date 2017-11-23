@@ -100,8 +100,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     bestChild = BestChild(bestChild);
                 }
                 this.BestActionSequence = temp.ToArray();
-                this.BestAction = BestChild(rootNode).Action;
-                return BestAction;
+                var toReturn = BestChild(rootNode);
+                if (toReturn != null)
+                {
+                    this.BestAction = toReturn.Action;
+                    return BestAction;
+                }
+                else
+                {
+                    return null;
+                }
             }
             return null;
         }
@@ -209,6 +217,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         // this method is very similar to the bestUCTChild,
         // but it is used to return the final action of the MCTS search, and so we do not care about
         // the exploration factor
+        [CanBeNull]
         private MCTSNode BestChild(MCTSNode node)
         {
             MCTSNode best = null;

@@ -178,8 +178,12 @@ namespace Assets.Scripts.GameManager
 
         public void PickUpChest(GameObject chest)
         {
+            Debug.Log(chest != null);
+            Debug.Log(chest.activeSelf);
+            Debug.Log(InChestRange(chest));
             if (chest != null && chest.activeSelf && InChestRange(chest))
             {
+                Debug.Log("Apanhei Chest!");
                 this.chests.Remove(chest);
                 GameObject.DestroyObject(chest);
                 this.characterData.Money += 5;
