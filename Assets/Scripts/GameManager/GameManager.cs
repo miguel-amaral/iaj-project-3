@@ -21,6 +21,9 @@ namespace Assets.Scripts.GameManager
         public Text LevelText;
         public Text MoneyText;
         public GameObject GameEnd;
+        public Camera TopCamera;
+        public Camera PlayerCamera;
+
 
         //private fields
         public List<GameObject> chests;
@@ -51,7 +54,10 @@ namespace Assets.Scripts.GameManager
             this.enemies.AddRange(this.orcs);
             this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
             this.enemies.AddRange(this.dragons);
-            
+            TopCamera = GameObject.Find("Camera").GetComponent<Camera>();
+            PlayerCamera = GameObject.Find("CameraPerson").GetComponent<Camera>();
+            TopCamera.enabled = true;
+            PlayerCamera.enabled = false;
         }
 
         public void Update()
@@ -108,6 +114,12 @@ namespace Assets.Scripts.GameManager
             {
                 this.GameEnd.SetActive(true);
                 this.GameEnd.GetComponentInChildren<Text>().text = "Victory";
+            }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                TopCamera.enabled = !TopCamera.enabled;
+                PlayerCamera.enabled = !PlayerCamera.enabled;
             }
         }
 
