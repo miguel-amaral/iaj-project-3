@@ -46,11 +46,10 @@ namespace Assets.Scripts.GameManager
 
             if (money == 25 && hp > 0) {
                 //Debug.Log("Ganhei");
-                return 200 - (time > 200 ? 200 : time) + 1000; //0.5f + 0.0025f * (200 -time);
-            } else if (money == 0 && time > 200) {
-                return 0;
+                return 125 + 200 + 200 - (time > 200 ? 200 : time); //0.5f + 0.0025f * (200 -time);
+           
             } else { 
-                return 1 * money + 3 * 0.25f * time;
+                return money;
             }
             //if (money > 0)
             //{
