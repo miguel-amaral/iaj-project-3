@@ -13,24 +13,44 @@ namespace Assets.Scripts.DecisionMakingActions
             this.Character = character;
         }
 
-        public override void ApplyActionEffects(WorldModel worldModel)
-        {
+        public override void ApplyActionEffects(WorldModel worldModel) {
             int maxHP = (int)worldModel.GetProperty(Properties.MAXHP);
             int level = (int)worldModel.GetProperty(Properties.LEVEL);
 
             //worldModel.SetProperty(Properties.LEVEL, level + 1);
             //worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
             //worldModel.SetProperty(Properties.HP, maxHP + 10);
-            if(level == 1) {
+            if (level == 1) {
                 worldModel.SetProperty(Properties.LEVEL, 2);
                 worldModel.SetProperty(Properties.MAXHP, 20);
                 worldModel.SetProperty(Properties.HP, 20);
-            }else if (level == 2) {
+            } else if (level == 2) {
                 worldModel.SetProperty(Properties.LEVEL, 3);
                 worldModel.SetProperty(Properties.MAXHP, 30);
                 worldModel.SetProperty(Properties.HP, 30);
             }
         }
+        public override void ApplyActionEffects(NewWorldModel worldModel) {
+            int maxHP = worldModel.stats.getStat(Stats.maxhp);
+            int level = worldModel.stats.getStat(Stats.lvl);
+
+
+            //worldModel.SetProperty(Properties.LEVEL, level + 1);
+            //worldModel.SetProperty(Properties.MAXHP, maxHP + 10);
+            //worldModel.SetProperty(Properties.HP, maxHP + 10);
+            if (level == 1) {
+                worldModel.stats.setStat(Stats.lvl, 2);
+                worldModel.stats.setStat(Stats.maxhp, 20);
+                worldModel.stats.setStat(Stats.hp, 20);
+
+            } else if (level == 2) {
+                worldModel.stats.setStat(Stats.lvl, 3);
+                worldModel.stats.setStat(Stats.maxhp, 30);
+                worldModel.stats.setStat(Stats.hp, 30);
+            }
+        }
+
+
 
         public override bool CanExecute()
         {
@@ -61,6 +81,18 @@ namespace Assets.Scripts.DecisionMakingActions
             }
             else if (level == 2)
             {
+                return xp >= 30;
+            }
+
+            return false;
+        }
+        public override bool CanExecute(NewWorldModel worldModel) {
+            int xp = worldModel.stats.getStat(Stats.xp);
+            int level = worldModel.stats.getStat(Stats.lvl);
+
+            if (level == 1) {
+                return xp >= 10;
+            } else if (level == 2) {
                 return xp >= 30;
             }
 

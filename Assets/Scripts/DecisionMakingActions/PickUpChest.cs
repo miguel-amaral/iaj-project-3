@@ -32,6 +32,14 @@ namespace Assets.Scripts.DecisionMakingActions
             return true;
         }
 
+        public override bool CanExecute(NewWorldModel worldModel) {
+            if (!base.CanExecute(worldModel)) return false;
+            return true;
+        }
+
+
+
+
         public override void Execute()
         {
             base.Execute();
@@ -51,5 +59,18 @@ namespace Assets.Scripts.DecisionMakingActions
             //disables the target object so that it can't be reused again
             worldModel.SetProperty(this.Target.name, false);
         }
+
+        public override void ApplyActionEffects(NewWorldModel worldModel) {
+            base.ApplyActionEffects(worldModel);
+
+
+            //disables the target object so that it can't be reused again
+            var s = this.Target.name;
+            s = s.Substring(5);
+            var index = int.Parse(s);
+            worldModel.chests[index - 1] = false;
+        }
+
+
     }
 }

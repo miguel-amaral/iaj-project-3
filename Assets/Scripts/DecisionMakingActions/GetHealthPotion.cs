@@ -24,10 +24,19 @@ namespace Assets.Scripts.DecisionMakingActions
 		    if (!base.CanExecute(worldModel)) return false;
 
 		    var hp = (int)worldModel.GetProperty(Properties.HP);
-		    return hp < Character.GameManager.characterData.MaxHP;
+		    return hp < (int)worldModel.GetProperty(Properties.MAXHP);
         }
 
-		public override void Execute()
+        public override bool CanExecute(NewWorldModel worldModel) {
+            if (!base.CanExecute(worldModel)) return false;
+
+            var hp = worldModel.stats.getStat(Stats.hp);
+
+            return hp < worldModel.stats.getStat(Stats.maxhp);
+        }
+
+
+        public override void Execute()
 		{
 		    base.Execute();
 		    this.Character.GameManager.GetHealthPotion(this.Target);
@@ -39,6 +48,17 @@ namespace Assets.Scripts.DecisionMakingActions
 		    worldModel.SetProperty(Properties.HP, Character.GameManager.characterData.MaxHP);
 		    //disables the target object so that it can't be reused again
 		    worldModel.SetProperty(this.Target.name, false);
+        }
+
+        public override void ApplyActionEffects(NewWorldModel worldModel) {
+            base.ApplyActionEffects(worldModel);
+
+            worldModel.stats.setStat(Stats.hp, worldModel.stats.getStat(Stats.maxhp);
+            //disables the target object so that it can't be reused again
+            var s = this.Target.name;
+            s = s.Substring(12);
+            var index = int.Parse(s);
+            worldModel.healthPots[index - 1] = false;
         }
     }
 }

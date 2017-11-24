@@ -186,6 +186,8 @@ namespace Assets.Scripts
                 Debug.Log(debugModel.toString());
                 Debug.Log(debugModel2.toString());
                 new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);
+                new PickUpChest(this, GameObject.FindGameObjectWithTag("Chest")).ApplyActionEffects(debugModel2);
+                new GetManaPotion(this, GameObject.FindGameObjectWithTag("ManaPotion")).ApplyActionEffects(debugModel2);
                 //debugModel.GetNextAction();
                 //Debug.Log(debugModel.toString());
 
