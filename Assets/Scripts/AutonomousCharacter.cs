@@ -67,6 +67,9 @@ namespace Assets.Scripts
 		private Animator characterAnimator;
         private bool alreadyCalculatedNextReconsider;
 
+        private NewCurrentStateWorldModel debugModel;
+        private NewWorldModel debugModel2;
+
         public void Initialize(NavMeshPathGraph navMeshGraph, AStarPathfinding pathfindingAlgorithm)
         {
             this.draw = true;
@@ -79,6 +82,8 @@ namespace Assets.Scripts
 
         public void Start()
         {
+            
+
             this.draw = true;
 
             this.navMesh = NavigationManager.Instance.NavMeshGraphs[0];
@@ -158,6 +163,10 @@ namespace Assets.Scripts
             }
             this.Actions.Add(new LevelUp(this));
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
+
+            debugModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
+            debugModel2 = debugModel.GenerateChildWorldModel();
+
             this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
@@ -167,10 +176,19 @@ namespace Assets.Scripts
         void Update()
         {
            
-
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
+
                 Debug.Log("Reconsidering");
+
+
+                debugModel.UpdateCurrentStateWorldModel();
+                Debug.Log(debugModel.toString());
+                Debug.Log(debugModel2.toString());
+                new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);
+                //debugModel.GetNextAction();
+                //Debug.Log(debugModel.toString());
+
                 this.GameManager.WorldChanged = false;
                 //this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
 
@@ -288,28 +306,31 @@ namespace Assets.Scripts
                 }
                 //alreadyCalculatedNextReconsider = false;
                 this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
-            }
+            } else {
+                this.TotalProcessingTimeText.text = "Total: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F")
+                                              + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F");
 
-            var mcts = this.GOAPDecisionMaking as MCTS;
-
-            this.TotalProcessingTimeText.text = "Total: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F")
-                                              + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F")
-                                              + (mcts != null ? "\nPlayouts: " + mcts.PlayoutNodes : "");//this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
-            //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
-
-            if (this.GOAPDecisionMaking.BestAction != null)
-            {
-                var actionText = "";
-                foreach (var action in this.GOAPDecisionMaking.BestActionSequence)
-                {
-                    actionText += "\n" + action.Name;
+                var mcts = this.GOAPDecisionMaking as MCTS;
+                if (mcts != null) {
+                    this.TotalProcessingTimeText.text += "\nPlayouts: "+ mcts.PlayoutNodes;
                 }
-                this.BestActionText.text = "Best Action Sequence: " + actionText;
+                //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
+                //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
+
+                if (this.GOAPDecisionMaking.BestAction != null) {
+                    var actionText = "";
+                    foreach (var action in this.GOAPDecisionMaking.BestActionSequence) {
+                        actionText += "\n" + action.Name;
+                    }
+                    this.BestActionText.text = "Best Action Sequence: " + actionText;
+                } else {
+                    this.BestActionText.text = "Best Action Sequence:\nNone";
+                }
             }
-            else
-            {
-                this.BestActionText.text = "Best Action Sequence:\nNone";
-            }
+
+
+
+            
         }
 
         public void StartPathfinding(Vector3 targetPosition)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.GameManager;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
@@ -42,8 +43,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             return this.Duration;
         }
 
+        public virtual float GetDuration(NewWorldModel worldModel) {
+            return this.Duration;
+        }
+
         public virtual bool CanExecute(WorldModel woldModel)
         {
+            return true;
+        }
+
+        public virtual bool CanExecute(NewWorldModel woldModel) {
             return true;
         }
 
@@ -58,6 +67,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public virtual void ApplyActionEffects(WorldModel worldModel)
         {
+        }
+
+        public virtual void ApplyActionEffects(NewWorldModel worldModel) {
         }
     }
 }

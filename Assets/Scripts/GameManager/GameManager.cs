@@ -31,6 +31,9 @@ namespace Assets.Scripts.GameManager
         public List<GameObject> orcs;
         public List<GameObject> dragons;
         public List<GameObject> enemies;
+        public List<GameObject> healthPots;
+        public List<GameObject> manaPots;
+
 
         public CharacterData characterData;
         public bool WorldChanged { get; set; }
@@ -40,6 +43,8 @@ namespace Assets.Scripts.GameManager
         private float nextUpdateTime = 0.0f;
         private Vector3 previousPosition;
 
+        
+
         public void Start()
         {
             this.WorldChanged = false;
@@ -47,17 +52,21 @@ namespace Assets.Scripts.GameManager
             this.previousPosition = this.character.transform.position;
 
             this.enemies = new List<GameObject>();
-            this.chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
-            this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").ToList();
+            this.chests = GameObject.FindGameObjectsWithTag("Chest").OrderBy(go => go.name).ToList();
+            this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").OrderBy(go => go.name).ToList();
             this.enemies.AddRange(this.skeletons);
-            this.orcs = GameObject.FindGameObjectsWithTag("Orc").ToList();
+            this.orcs = GameObject.FindGameObjectsWithTag("Orc").OrderBy(go => go.name).ToList();
             this.enemies.AddRange(this.orcs);
-            this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
+            this.dragons = GameObject.FindGameObjectsWithTag("Dragon").OrderBy(go => go.name).ToList();
             this.enemies.AddRange(this.dragons);
+            this.healthPots = GameObject.FindGameObjectsWithTag("HealthPotion").OrderBy(go => go.name).ToList();
+            this.manaPots = GameObject.FindGameObjectsWithTag("ManaPotion").OrderBy(go => go.name).ToList();
+            //debugEnemies = enemies.ToArray();
             TopCamera = GameObject.Find("Camera").GetComponent<Camera>();
             PlayerCamera = GameObject.Find("CameraPerson").GetComponent<Camera>();
             TopCamera.enabled = true;
             PlayerCamera.enabled = false;
+           
         }
 
         public void Update()
@@ -127,11 +136,17 @@ namespace Assets.Scripts.GameManager
         {
             if (enemy != null && enemy.activeSelf && InMeleeRange(enemy))
             {
+
+                //foreach(var i in debugEnemies) {
+                //    Debug.Log(i);
+                //}
                 this.enemies.Remove(enemy);
                 enemy.SetActive(false);
-                GameObject.DestroyObject(enemy);
+                //GameObject.DestroyObject(enemy);
+                
+                
 
-                if(enemy.tag.Equals("Skeleton"))
+                if (enemy.tag.Equals("Skeleton"))
                 {
                     this.characterData.HP -= 5;
                     this.characterData.XP += 5;
@@ -146,6 +161,13 @@ namespace Assets.Scripts.GameManager
                     this.characterData.HP -= 20;
                     this.characterData.XP += 20;
                 }
+                Destroy(enemy);
+                enemy = null;
+
+                //Debug.Log("Depois");
+                //foreach (var i in debugEnemies) {
+                //    Debug.Log(i);
+                //}
 
                 this.WorldChanged = true;
             }
@@ -155,7 +177,10 @@ namespace Assets.Scripts.GameManager
         {
             if (enemy != null && enemy.activeSelf && InFireballRange(enemy) && this.characterData.Mana >= 5)
             {
-                
+                //foreach (var i in debugEnemies) {
+                //    Debug.Log(i);
+                //}
+
                 if (enemy.tag.Equals("Skeleton"))
                 {
                     this.characterData.XP += 5;
@@ -173,6 +198,15 @@ namespace Assets.Scripts.GameManager
                 }
                 this.characterData.Mana -= 5;
 
+
+
+                Destroy(enemy);
+                enemy = null;
+
+                //Debug.Log("Depois");
+                //foreach (var i in debugEnemies) {
+                //    Debug.Log(i);
+                //}
                 this.WorldChanged = true;
             }
         }
@@ -184,11 +218,15 @@ namespace Assets.Scripts.GameManager
             //Debug.Log(InChestRange(chest));
             if (chest != null && chest.activeSelf && InChestRange(chest))
             {
-                Debug.Log("Apanhei Chest!");
+                
+
+           
                 this.chests.Remove(chest);
                 GameObject.DestroyObject(chest);
                 this.characterData.Money += 5;
                 this.WorldChanged = true;
+
+                
             }
         }
 

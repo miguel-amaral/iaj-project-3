@@ -43,6 +43,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var mana = (int)currentPlayoutState.GetProperty(Properties.MANA);
             var hp = (int)currentPlayoutState.GetProperty(Properties.HP);
+            var lvl = (int)currentPlayoutState.GetProperty(Properties.LEVEL);
+            var position = (Vector3)currentPlayoutState.GetProperty(Properties.POSITION);
 
             foreach (var executableAction in currentPlayoutState.GetExecutableActions())
             {
@@ -61,11 +63,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         sum += 40;
                     }
                 }
+                if(lvl<3 && executableAction.Name.Contains("Dragon")) {
+                    continue;
+                }
 
                 if(hp <= 5 && executableAction.Name.StartsWith("Sword")) {
                     continue;
                 }
-
+                //private bool CheckRange(GameObject obj, float maximumSqrDistance) {
+                //    return (obj.transform.position - this.characterData.CharacterGameObject.transform.position).sqrMagnitude <= maximumSqrDistance;
+                //}
+                //if (currentPlayoutState.
 
 
                 bestOverallAction.Add(executableAction);

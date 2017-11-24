@@ -50,9 +50,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public void InitializeDecisionMakingProcess()
         {
-            foreach( var a in this.CurrentStateWorldModel.GetExecutableActions()) {
-                Debug.Log(a);
-            }
+            //foreach( var a in this.CurrentStateWorldModel.GetExecutableActions()) {
+            //    Debug.Log(a);
+            //}
             
 
             this.MaxPlayoutDepthReached = 0;
