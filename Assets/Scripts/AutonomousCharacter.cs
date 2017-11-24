@@ -290,8 +290,11 @@ namespace Assets.Scripts
                 this.nextUpdateTime = Time.time + DECISION_MAKING_INTERVAL;
             }
 
+            var mcts = this.GOAPDecisionMaking as MCTS;
+
             this.TotalProcessingTimeText.text = "Total: " + this.GOAPDecisionMaking.TotalProcessingTime.ToString("F")
-                                              + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F");//this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
+                                              + " Partial: " + this.GOAPDecisionMaking.ParcialProcessingTime.ToString("F")
+                                              + (mcts != null ? "\nPlayouts: " + mcts.PlayoutNodes : "");//this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
             //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
 
             if (this.GOAPDecisionMaking.BestAction != null)

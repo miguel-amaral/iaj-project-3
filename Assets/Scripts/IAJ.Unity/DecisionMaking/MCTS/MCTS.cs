@@ -17,6 +17,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
+
+        public float PlayoutNodes { get; private set; }
+
         public float ParcialProcessingTime { get; private set; }
         
         public MCTSNode BestFirstChild { get; set; }
@@ -40,6 +43,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
+
+            this.PlayoutNodes = 0;
         }
 
 
@@ -64,6 +69,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = true;
             this.BestFirstChild = null;
             this.ParcialProcessingTime = 0;
+
             // this.BestActionSequence = new List<GOB.Action>();
         }
 
@@ -150,6 +156,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(WorldModel currentPlayoutState) {
             while (!currentPlayoutState.IsTerminal()) {
+                this.PlayoutNodes++;
                 var action = GuidedAction(currentPlayoutState);
                 if(action == null) {
                     return new Reward {
