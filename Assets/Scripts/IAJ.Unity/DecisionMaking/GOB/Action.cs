@@ -70,6 +70,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         }
 
         public virtual void ApplyActionEffects(NewWorldModel worldModel) {
+            
+        }
+
+        public virtual void RemoveEffect(NewWorldModel worldModel) {
+
         }
     }
 }

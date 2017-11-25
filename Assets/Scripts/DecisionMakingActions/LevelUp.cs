@@ -48,6 +48,8 @@ namespace Assets.Scripts.DecisionMakingActions
                 worldModel.stats.setStat(Stats.maxhp, 30);
                 worldModel.stats.setStat(Stats.hp, 30);
             }
+
+            worldModel.SetLastAction(this);
         }
 
 
@@ -118,5 +120,11 @@ namespace Assets.Scripts.DecisionMakingActions
         {
             return 0.0f;
         }
-    }
+
+        public override void RemoveEffect(NewWorldModel worldModel) {
+
+        }
+
+        
+        }
 }

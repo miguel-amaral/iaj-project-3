@@ -112,9 +112,16 @@ namespace Assets.Scripts.DecisionMakingActions
             } else {
                 Debug.Log("Not valid target");  
             }
-            
 
+            if(worldModel.GetNextPlayer() == 1) {
+                if (worldModel.IsTerminal()) {
+                    worldModel.RemoveLastActionEffect();
+                }
+            }
+
+            worldModel.SetLastAction(this);
         }
+        
 
     }
 }

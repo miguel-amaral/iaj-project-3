@@ -195,6 +195,10 @@ namespace Assets.Scripts.DecisionMakingActions
             
         }
 
+        public override void RemoveEffect(NewWorldModel worldModel) {
+
+        }
+
 
     }
 }

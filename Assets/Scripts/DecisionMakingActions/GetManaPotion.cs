@@ -58,6 +58,10 @@ namespace Assets.Scripts.DecisionMakingActions
             s = s.Substring(10);
             var index = int.Parse(s);
             worldModel.manaPots[index - 1] = false;
+
+            worldModel.SetLastAction(this);
         }
+
+       
     }
 }

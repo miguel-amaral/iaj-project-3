@@ -15,6 +15,7 @@ using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
+using System.Linq;
 
 namespace Assets.Scripts
 {
@@ -134,9 +135,29 @@ namespace Assets.Scripts
             this.Actions = new List<Action>();
 
 
-            foreach (var chest in GameObject.FindGameObjectsWithTag("Chest"))
-            {
+            var Skeletons = GameObject.FindGameObjectsWithTag("Skeleton");
+            var Orcs = GameObject.FindGameObjectsWithTag("Orc");
+            var Dragons = GameObject.FindGameObjectsWithTag("Dragon");
+            var enemies = (Skeletons.Concat(Orcs).Concat(Dragons)).ToArray();
+
+            Dictionary<string, List<string>> chestInfo = new Dictionary<string, List<string>>();
+            
+
+            foreach (var chest in GameObject.FindGameObjectsWithTag("Chest")) {
                 this.Actions.Add(new PickUpChest(this, chest));
+
+                //MCTSBIASED STUFF
+                List<string> chestEnemies = new List<string>();
+                var chestPosition = chest.transform.position;
+                foreach (var enemy in enemies.ToArray()) {
+                    //Debug.Log(enemy);
+                    if((enemy.transform.position - chestPosition).sqrMagnitude <= 400) {
+                        chestEnemies.Add(enemy.name);
+                    }
+                }
+                chestInfo.Add(chest.name, chestEnemies);
+                
+
             }
 
             foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
@@ -149,19 +170,19 @@ namespace Assets.Scripts
                 this.Actions.Add(new GetHealthPotion(this, potion));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Skeleton"))
+            foreach (var enemy in Skeletons)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Orc"))
+            foreach (var enemy in Orcs)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Dragon"))
+            foreach (var enemy in Dragons)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
@@ -169,16 +190,17 @@ namespace Assets.Scripts
             this.Actions.Add(new LevelUp(this));
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
 
+
             currentNewWorldModelDebug = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
 
             newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
             debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
             PreviousTargetName = "";
 
-
-            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
+            this.GOAPDecisionMaking = new NewMCTSBiasedPlayout(newWorldModel, chestInfo);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }
@@ -191,15 +213,10 @@ namespace Assets.Scripts
 
                 Debug.Log("Reconsidering");
 
-
-
-                Debug.Log("xD!");
-                //if (this.GameManager.WorldChanged) {
-                //    return;
-                //}
+                
                 currentNewWorldModelDebug.UpdateCurrentStateWorldModel();
                 newWorldModel.UpdateCurrentStateWorldModel();
-                Debug.Log("xD!2");
+                
                 //Debug.Log(debugModel2.toString());
                 //Debug.Log(debugModel2.toString());
                 //new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);
