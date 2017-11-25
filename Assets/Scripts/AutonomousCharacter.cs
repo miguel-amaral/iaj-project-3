@@ -371,7 +371,8 @@ namespace Assets.Scripts
                     var walk = this.CurrentAction as WalkToTargetAndExecuteAction;
                     if (walk != null) {
                         Gizmos.color = Color.black;
-                        Gizmos.DrawWireSphere(walk.Target.transform.position, 3.0F);
+                        // FIXME: AMARAL isto rebenta
+                     //   Gizmos.DrawWireSphere(walk.Target.transform.position, 3.0F);
                     }
                     Gizmos.color = Color.cyan;
                     Gizmos.DrawWireSphere(this.AStarPathFinding.GoalPosition, 3.0F);

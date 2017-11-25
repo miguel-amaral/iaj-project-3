@@ -181,7 +181,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding
             }
         }
 
-        private static string Path()
+        public static string Path()
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path == "")

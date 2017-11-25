@@ -1,6 +1,12 @@
-﻿using Assets.Scripts.GameManager;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System.Text.RegularExpressions;
+using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
+using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
+using UnityEditor;
 using UnityEngine;
 using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
 
@@ -8,6 +14,8 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public abstract class WalkToTargetAndExecuteAction : Action
     {
+        private const float RadiusOfDetection = 9f;
+
         protected AutonomousCharacter Character { get; set; }
 
         public GameObject Target { get; protected set; }
@@ -36,8 +44,44 @@ namespace Assets.Scripts.DecisionMakingActions
 
         private float GetDuration(Vector3 currentPosition)
         {
-			var distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+            float distance;
+            string closestObjectName;
+            if ((closestObjectName = GetClosestObjectName(this.Character.Character.GameObject)) != null)
+            {
+                //Debug.Log("Using offline heuristic!");
+                try
+                {
+                    distance = OfflineTableHeuristic.Instance.H(closestObjectName, Target.gameObject.name);
+                }
+                catch (KeyNotFoundException)
+                {
+			        distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+                }
+            }
+            else
+            {
+			    distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+            }
             return distance / this.Character.Character.MaxSpeed;
+        }
+
+        
+        private string GetClosestObjectName(GameObject charGameObject, float radius = RadiusOfDetection)
+        {
+            string closest = null;
+            float minDist = Single.MaxValue;
+            var ourGameObjects = OfflineTableHeuristic.Instance.OurGameObjects();
+            foreach (var gameObject in ourGameObjects)
+            {
+                float distance;
+                if ((distance = Vector3.Distance(charGameObject.transform.position, gameObject.Right)) <=
+                    RadiusOfDetection && distance < minDist)
+                {
+                    minDist = distance;
+                    closest = gameObject.Left;
+                }
+            }
+            return closest;
         }
 
         public override float GetGoalChange(Goal goal)

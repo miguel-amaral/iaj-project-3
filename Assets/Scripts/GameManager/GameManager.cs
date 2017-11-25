@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,7 +67,7 @@ namespace Assets.Scripts.GameManager
             PlayerCamera = GameObject.Find("CameraPerson").GetComponent<Camera>();
             TopCamera.enabled = true;
             PlayerCamera.enabled = false;
-           
+            var offlineTableHeuristic = OfflineTableHeuristic.Instance; // just to initialize singleton
         }
 
         public void Update()

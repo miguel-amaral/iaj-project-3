@@ -53,7 +53,7 @@ namespace Assets.Scripts.DecisionMakingActions
         public override void ApplyActionEffects(NewWorldModel worldModel) {
             base.ApplyActionEffects(worldModel);
 
-            worldModel.stats.setStat(Stats.hp, worldModel.stats.getStat(Stats.maxhp);
+            worldModel.stats.setStat(Stats.hp, worldModel.stats.getStat(Stats.maxhp));
             //disables the target object so that it can't be reused again
             var s = this.Target.name;
             s = s.Substring(12);
