@@ -45,8 +45,9 @@ namespace Assets.Scripts.GameManager {
             int hp = this.stats.getStat(Stats.hp);
             float time = this.stats.getTime();
 
-            if (money == 25 && hp > 0) {
-                //Debug.Log("Ganhei");
+            if (money == 25 && hp > 0 && time < 200) {
+
+                
                 return 125 + 200 + 200 - (time > 200 ? 200 : time); //0.5f + 0.0025f * (200 -time);
 
             } else {

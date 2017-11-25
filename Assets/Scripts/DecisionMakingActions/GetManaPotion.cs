@@ -31,7 +31,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
             var mana = worldModel.stats.getStat(Stats.mn);
             
-            return mana < 10;
+            return mana < 11;
         }
 
 

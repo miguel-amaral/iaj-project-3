@@ -10,7 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTS : DecisionMakingBase
     {
-        public const float C = 1.4f * 250;
+        public const float C = 1.4f * 525;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }

@@ -46,22 +46,25 @@ namespace Assets.Scripts.DecisionMakingActions
         {
             float distance;
             string closestObjectName;
-            if ((closestObjectName = GetClosestObjectName(this.Character.Character.GameObject)) != null)
-            {
-                //Debug.Log("Using offline heuristic!");
-                try
-                {
-                    distance = OfflineTableHeuristic.Instance.H(closestObjectName, Target.gameObject.name);
-                }
-                catch (KeyNotFoundException)
-                {
-			        distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-                }
-            }
-            else
-            {
-			    distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-            }
+            //if ((closestObjectName = GetClosestObjectName(this.Character.Character.GameObject)) != null)
+            //{
+            //    //Debug.Log("Using offline heuristic!");
+            //    try
+            //    {
+            //        distance = OfflineTableHeuristic.Instance.H(closestObjectName, Target.gameObject.name);
+            //        //Debug.Log("It worked");
+            //    }
+            //    catch (KeyNotFoundException)
+            //    {
+            //        Debug.Log("Fail");
+
+            //        distance = (this.Target.transform.position - currentPosition).magnitude;
+            //    }
+            //}
+            //else
+            //{
+			    distance = (this.Target.transform.position - currentPosition).magnitude;
+            //}
             return distance / this.Character.Character.MaxSpeed;
         }
 
@@ -180,6 +183,8 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.stats.setTime(worldModel.stats.getTime()+duration);
             //worldModel.SetProperty(Properties.TIME, time + duration);
             worldModel.stats.setPosition(Target.transform.position);
+
+            //Debug.Log(time + " -> " + worldModel.stats.getTime());
             //worldModel.SetProperty(Properties.POSITION, Target.transform.position);
             
         }

@@ -10,7 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class NewMCTS : DecisionMakingBase
     {
-        public const float C = 1.4f * 250;
+        public const float C = 1.4f * 525;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
@@ -147,7 +147,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         Debug.Log("Escrita Arvore");
                         Debug.Log("Arvore nos : " + numero);
                     } else {
-                        currentNode = BestUCTChild(currentNode);
+                        currentNode = BestUCTChild(currentNode, initialNode);
                     }
                 }
             }
@@ -211,14 +211,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         //gets the best child of a node, using the UCT formula
-        private NewMCTSNode BestUCTChild(NewMCTSNode node)
+        private NewMCTSNode BestUCTChild(NewMCTSNode node, NewMCTSNode initialNode)
         {
             NewMCTSNode best = null;
             var bestUCT = double.MinValue;
             foreach (var nodeChildNode in node.ChildNodes)
             {
                 var firstPart = nodeChildNode.Q / nodeChildNode.N;
-                var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
+                var secondPart = C * Math.Sqrt(Math.Log(initialNode.N) / nodeChildNode.N);
                 var sum = firstPart + secondPart;
                 if (sum > bestUCT)
                 {
@@ -244,6 +244,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 {
                     bestUCT = firstPart;
                     best = nodeChildNode;
+                }else if(Math.Abs(bestUCT -firstPart) < 0.1f) {
+                    //Debug.Log("Muito merda"); 
                 }
             }
             return best;
