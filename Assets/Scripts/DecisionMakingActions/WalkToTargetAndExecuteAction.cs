@@ -45,44 +45,55 @@ namespace Assets.Scripts.DecisionMakingActions
         private float GetDuration(Vector3 currentPosition)
         {
             float distance;
-            string closestObjectName;
-            if ((closestObjectName = GetClosestObjectName(this.Character.Character.GameObject)) != null)
+            var heuristic = OfflineTableHeuristic.Instance;
+
+            if (heuristic.GotEntry(Character.PreviousTargetName, Target.gameObject.name))
             {
-                //Debug.Log("Using offline heuristic!");
-                try
-                {
-                    distance = OfflineTableHeuristic.Instance.H(closestObjectName, Target.gameObject.name);
-                }
-                catch (KeyNotFoundException)
-                {
-			        distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-                }
+                distance = heuristic.H(Character.PreviousTargetName, Target.gameObject.name);
             }
             else
             {
-			    distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+                distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
             }
             return distance / this.Character.Character.MaxSpeed;
+            //if ((closestObjectName = GetClosestObjectName(this.Character)) != null)
+            //{
+            //Debug.Log("Using offline heuristic!");
+            //try
+            //{
+            //    distance = OfflineTableHeuristic.Instance.H(Character.PreviousTargetName, Target.gameObject.name);
+            //}
+            //catch (KeyNotFoundException)
+            //{
+            //Debug.Log("Ups! Using Ecli! PrevTargetName: " + Character.PreviousTargetName);
+            //distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+               // }
+       //     }
+       //     else
+       //     {
+			    //distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
+       //     }
         }
 
         
-        private string GetClosestObjectName(GameObject charGameObject, float radius = RadiusOfDetection)
-        {
-            string closest = null;
-            float minDist = Single.MaxValue;
-            var ourGameObjects = OfflineTableHeuristic.Instance.OurGameObjects();
-            foreach (var gameObject in ourGameObjects)
-            {
-                float distance;
-                if ((distance = Vector3.Distance(charGameObject.transform.position, gameObject.Right)) <=
-                    RadiusOfDetection && distance < minDist)
-                {
-                    minDist = distance;
-                    closest = gameObject.Left;
-                }
-            }
-            return closest;
-        }
+        //private string GetClosestObjectName(AutonomousCharacter charGameObject, float radius = RadiusOfDetection)
+        //{
+
+        //    string closest = null;
+        //    float minDist = Single.MaxValue;
+        //    var ourGameObjects = OfflineTableHeuristic.Instance.OurGameObjects();
+        //    foreach (var gameObject in ourGameObjects)
+        //    {
+        //        float distance;
+        //        if ((distance = Vector3.Distance(charGameObject.transform.position, gameObject.Right)) <=
+        //            RadiusOfDetection && distance < minDist)
+        //        {
+        //            minDist = distance;
+        //            closest = gameObject.Left;
+        //        }
+        //    }
+        //    return closest;
+        //}
 
         public override float GetGoalChange(Goal goal)
         {
@@ -152,7 +163,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override void Execute()
         {
-            this.Character.StartPathfinding(this.Target.transform.position);
+            this.Character.StartPathfinding(this.Target);
         }
 
 
