@@ -170,9 +170,9 @@ namespace Assets.Scripts
             newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
             debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
 
-            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
-            this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
+            //this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }
@@ -187,9 +187,13 @@ namespace Assets.Scripts
 
 
 
-
+                Debug.Log("xD!");
+                //if (this.GameManager.WorldChanged) {
+                //    return;
+                //}
                 currentNewWorldModelDebug.UpdateCurrentStateWorldModel();
                 newWorldModel.UpdateCurrentStateWorldModel();
+                Debug.Log("xD!2");
                 //Debug.Log(debugModel2.toString());
                 //Debug.Log(debugModel2.toString());
                 //new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);

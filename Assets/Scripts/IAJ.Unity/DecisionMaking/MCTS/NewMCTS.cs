@@ -39,8 +39,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 100;
-            this.MaxIterationsProcessedPerFrame = 50;
+            this.MaxIterations = 10000;
+            this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
 
@@ -53,6 +53,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             //foreach( var a in this.CurrentStateWorldModel.GetExecutableActions()) {
             //    Debug.Log(a);
             //}
+
             
 
             this.MaxPlayoutDepthReached = 0;

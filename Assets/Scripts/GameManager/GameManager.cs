@@ -162,7 +162,7 @@ namespace Assets.Scripts.GameManager
                     this.characterData.HP -= 20;
                     this.characterData.XP += 20;
                 }
-                Destroy(enemy);
+                DestroyImmediate(enemy);
                 enemy = null;
 
                 //Debug.Log("Depois");
@@ -219,11 +219,12 @@ namespace Assets.Scripts.GameManager
             //Debug.Log(InChestRange(chest));
             if (chest != null && chest.activeSelf && InChestRange(chest))
             {
-                
 
-           
-                this.chests.Remove(chest);
-                GameObject.DestroyObject(chest);
+
+
+                //this.chests.Remove(chest);
+                //GameObject.DestroyObject(chest);
+                DestroyImmediate(chest);
                 this.characterData.Money += 5;
                 this.WorldChanged = true;
 
