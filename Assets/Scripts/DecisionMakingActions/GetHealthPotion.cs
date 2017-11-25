@@ -59,6 +59,9 @@ namespace Assets.Scripts.DecisionMakingActions
             s = s.Substring(12);
             var index = int.Parse(s);
             worldModel.healthPots[index - 1] = false;
+            worldModel.SetLastAction(this);
         }
+
+        
     }
 }

@@ -9,6 +9,8 @@ namespace Assets.Scripts.GameManager {
         protected int NextPlayer { get; set; }
         protected Action NextEnemyAction { get; set; }
         protected Action[] NextEnemyActions { get; set; }
+        public Action LastAction;
+        
 
         public NewFutureStateWorld(GameManager gm, List<Action> actions) :base(gm, actions) {
             this.NextPlayer = 0;
@@ -16,6 +18,8 @@ namespace Assets.Scripts.GameManager {
         }
 
         public NewFutureStateWorld(NewFutureStateWorld old) : base(old) {
+            this.NextPlayer = old.GetNextPlayer();
+            this.LastAction = old.LastAction;
             //copy stats maybe?
             //PopulatePossibleActions();
         }
@@ -32,7 +36,8 @@ namespace Assets.Scripts.GameManager {
             float time = this.stats.getTime();
             int money = this.stats.getStat(Stats.money);
 
-            return (this.NextPlayer == 0) && (HP <= 0 || time >= 200 || money == 25);
+            //return (this.NextPlayer == 0) && (HP <= 0 || time >= 200 || money == 25);
+            return (HP <= 0 || time >= 200 || money == 25);
         }
 
         public override float GetScore() {
@@ -47,6 +52,21 @@ namespace Assets.Scripts.GameManager {
             } else {
                 return money;
             }
+        }
+
+        public override void RemoveLastActionEffect() {
+            if(this.LastAction != null) {
+                this.LastAction.RemoveEffect(this);
+
+            }
+        }
+
+        public Action GetLastAction() {
+            return this.LastAction;
+        }
+
+        public override void SetLastAction(Action action) {
+            this.LastAction = action;
         }
 
         public override int GetNextPlayer() {

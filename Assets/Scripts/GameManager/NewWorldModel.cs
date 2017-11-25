@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
+﻿using Assets.Scripts.DecisionMakingActions;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace Assets.Scripts.GameManager {
 
     public class NewWorldModel {
         
-        protected GameManager gm;
+        public GameManager gm { get; protected set; }
 
         public bool[] skeletons;
         public bool[] orcs;
@@ -20,12 +21,18 @@ namespace Assets.Scripts.GameManager {
         private int nextAction;
         private List<Action> availableActions;
 
+        public int enemiesAlive;
+
         protected void PopulatePossibleActions() {
             this.nextAction = 0;
+            this.enemiesAlive = 0;
             availableActions = new List<Action>();
 
             foreach(var a in actions){
                 if (a.CanExecute(this)) {
+                    if (a.Name.Contains("Sword")) {
+                        enemiesAlive++;
+                    }
                     availableActions.Add(a);
                 }
             }
@@ -47,6 +54,8 @@ namespace Assets.Scripts.GameManager {
             
             //this.stats = new Stats(gm);
         }
+
+        
 
         public NewWorldModel(NewWorldModel oldWorld) : this(oldWorld.gm, oldWorld.actions) {
             this.skeletons = (bool[]) oldWorld.skeletons.Clone();
@@ -100,9 +109,15 @@ namespace Assets.Scripts.GameManager {
         public virtual void CalculateNextPlayer() {
         }
 
+        public virtual void SetLastAction(Action action) {
+
+        }
+
+        public virtual void RemoveLastActionEffect() { }
 
 
-        public string toString() {
+
+            public string toString() {
             string toReturn = "NEWWORLDMODEL\n";
             toReturn += "\nDragons - ";
             foreach (var a in dragons) {

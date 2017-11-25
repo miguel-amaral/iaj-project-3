@@ -71,8 +71,17 @@ namespace Assets.Scripts.DecisionMakingActions
             s = s.Substring(5);
             var index = int.Parse(s);
             worldModel.chests[index - 1] = false;
+
+            worldModel.SetLastAction(this);
         }
 
+        public override void RemoveEffect(NewWorldModel worldModel) {
+            base.RemoveEffect(worldModel);
+            var money = worldModel.stats.getStat(Stats.money);
+            worldModel.stats.setStat(Stats.money, money - 5);
+        }
 
-    }
+        
+
+        }
 }

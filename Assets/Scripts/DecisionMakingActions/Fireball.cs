@@ -119,7 +119,9 @@ namespace Assets.Scripts.DecisionMakingActions
                     Debug.Log("Not valid target");
                 }
             }
+            worldModel.SetLastAction(this);
         }
+        
 
     }
 }
