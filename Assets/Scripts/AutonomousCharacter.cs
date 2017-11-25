@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.DecisionMakingActions;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using Assets.Scripts.IAJ.Unity.Movement.DynamicMovement;
@@ -13,6 +14,7 @@ using Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
+using Action = Assets.Scripts.IAJ.Unity.DecisionMaking.GOB.Action;
 using System.Linq;
 
 namespace Assets.Scripts
@@ -63,7 +65,9 @@ namespace Assets.Scripts
         private float nextUpdateTime = 0.0f;
         private float previousGold = 0.0f;
         private int previousXP = 0;
-        private Vector3 previousTarget;
+
+        public Vector3 PreviousTargetPosition { get; set; }
+        public string PreviousTargetName { get; set; }
 
 		private Animator characterAnimator;
         private bool alreadyCalculatedNextReconsider;
@@ -191,6 +195,7 @@ namespace Assets.Scripts
 
             newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
             debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
+            PreviousTargetName = "";
 
             //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
@@ -260,7 +265,7 @@ namespace Assets.Scripts
                 //initialize Decision Making Proccess
                 this.CurrentAction = null;
                 this.GOAPDecisionMaking.InitializeDecisionMakingProcess();
-                previousTarget = new Vector3(0,0,0);
+                PreviousTargetPosition = new Vector3(Single.NaN, Single.NaN, Single.NaN);
             }
 
             
@@ -364,20 +369,23 @@ namespace Assets.Scripts
             
         }
 
-        public void StartPathfinding(Vector3 targetPosition)
+        public void StartPathfinding(GameObject target)
         {
             //if the targetPosition received is the same as a previous target, then this a request for the same target
             //no need to redo the pathfinding search
-
-            if (!this.previousTarget.Equals(targetPosition) || this.GameManager.WorldChanged)
+            var targetPosition = target.transform.position;
+            if (!this.PreviousTargetPosition.Equals(targetPosition) || this.GameManager.WorldChanged)
             {
                 Debug.Log("Entrei start pathfinding if");
                 this.AStarPathFinding.InitializePathfindingSearch(this.Character.KinematicData.position, targetPosition);
-                this.previousTarget = targetPosition;
+                    PreviousTargetPosition = targetPosition;
+                PreviousTargetName = target.name;
+                Debug.Log(PreviousTargetPosition +"\n" + PreviousTargetName);
             }
         }
 
-		public void OnDrawGizmos()
+
+        public void OnDrawGizmos()
 		{
 			if (this.draw)
 			{
