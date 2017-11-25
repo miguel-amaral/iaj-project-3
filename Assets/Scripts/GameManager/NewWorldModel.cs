@@ -18,20 +18,34 @@ namespace Assets.Scripts.GameManager {
 
         private List<Action> actions;
         private int nextAction;
-        private List<Action> availableActions = new List<Action>();
+        private List<Action> availableActions;
+
+        protected void PopulatePossibleActions() {
+            this.nextAction = 0;
+            availableActions = new List<Action>();
+
+            foreach(var a in actions){
+                if (a.CanExecute(this)) {
+                    availableActions.Add(a);
+                }
+            }
+        }
+
 
         public NewWorldModel(GameManager gm, List<Action> actions) {
+
             this.gm = gm;
             //foreach(var a in actions){
             //    if (a.CanExecute(this)) {
             //        availableActions.Add(a);
             //    }
             //}
-            this.nextAction = 0;
-            this.actions = actions;
-            this.availableActions = new List<Action>(actions);
             
-            this.stats = new Stats(gm);
+            this.actions = new List<Action>(actions);
+            this.availableActions = null;
+            //this.availableActions = new List<Action>();
+            
+            //this.stats = new Stats(gm);
         }
 
         public NewWorldModel(NewWorldModel oldWorld) : this(oldWorld.gm, oldWorld.actions) {
@@ -49,13 +63,19 @@ namespace Assets.Scripts.GameManager {
         }
 
         public virtual Action[] GetExecutableActions() {
+            if(availableActions == null) {
+                PopulatePossibleActions();
+            }
+
             return this.availableActions.ToArray();
         }
 
         public virtual Action GetNextAction() {
-            if(this.availableActions.Count == 0) {
-                return null;
-            } else if(nextAction< this.availableActions.Count){
+            if (availableActions == null) {
+                PopulatePossibleActions();
+            }
+
+            if(nextAction< this.availableActions.Count){
                 var actionToReturn = this.availableActions[nextAction];
                 nextAction++;
                 return actionToReturn;
@@ -108,17 +128,17 @@ namespace Assets.Scripts.GameManager {
             foreach (var a in manaPots) {
                 toReturn += a + " : ";
             }
-            toReturn += "\nActions - ";
-            foreach (var a in actions) {
-                toReturn += a + "\n : ";
-            }
+            toReturn += "\nStats - ";
+            toReturn += this.stats.toString();
+            toReturn += "\n";
+            //toReturn += "\nActions - ";
+            //foreach (var a in actions) {
+            //    toReturn += a + "\n : ";
+            //}
             toReturn += "\nAvailableActions - ";
             foreach (var a in availableActions) {
                 toReturn += a + "\n : ";
             }
-            toReturn += "\nStats - ";
-            toReturn += this.stats.toString();
-            toReturn += "\n";
             return toReturn;
         }
 

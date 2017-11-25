@@ -6,12 +6,16 @@ using UnityEngine;
 namespace Assets.Scripts.GameManager {
 
 
-    public class NewCurrentStateWorldModel : NewWorldModel {
+    public class NewCurrentStateWorldModel : NewFutureStateWorld {
 
-        
 
+        public void Initialize() {
+            //this.ActionEnumerator.Reset();
+        }
         public NewCurrentStateWorldModel(GameManager gm, List<Action> actions): base(gm, actions) {
             copyStats(gm);
+            this.stats = new Stats(gm);
+            //PopulatePossibleActions();
         }
 
         private void copyStats(GameManager gm) {

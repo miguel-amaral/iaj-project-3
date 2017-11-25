@@ -181,6 +181,7 @@ namespace Assets.Scripts.DecisionMakingActions
             //worldModel.SetProperty(Properties.TIME, time + duration);
             worldModel.stats.setPosition(Target.transform.position);
             //worldModel.SetProperty(Properties.POSITION, Target.transform.position);
+            
         }
 
 

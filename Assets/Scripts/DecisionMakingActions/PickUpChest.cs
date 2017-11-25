@@ -63,6 +63,8 @@ namespace Assets.Scripts.DecisionMakingActions
         public override void ApplyActionEffects(NewWorldModel worldModel) {
             base.ApplyActionEffects(worldModel);
 
+            var money = worldModel.stats.getStat(Stats.money);
+            worldModel.stats.setStat(Stats.money, money + 5);
 
             //disables the target object so that it can't be reused again
             var s = this.Target.name;

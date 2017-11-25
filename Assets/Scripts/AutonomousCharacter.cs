@@ -67,7 +67,8 @@ namespace Assets.Scripts
 		private Animator characterAnimator;
         private bool alreadyCalculatedNextReconsider;
 
-        private NewCurrentStateWorldModel debugModel;
+        private NewCurrentStateWorldModel currentNewWorldModelDebug;
+        private NewCurrentStateWorldModel newWorldModel;
         private NewWorldModel debugModel2;
 
         public void Initialize(NavMeshPathGraph navMeshGraph, AStarPathfinding pathfindingAlgorithm)
@@ -164,11 +165,14 @@ namespace Assets.Scripts
             this.Actions.Add(new LevelUp(this));
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
 
-            debugModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
-            debugModel2 = debugModel.GenerateChildWorldModel();
+            currentNewWorldModelDebug = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
 
-            this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
+            debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
+
+            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
+            this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
         }
@@ -182,12 +186,15 @@ namespace Assets.Scripts
                 Debug.Log("Reconsidering");
 
 
-                debugModel.UpdateCurrentStateWorldModel();
-                Debug.Log(debugModel.toString());
-                Debug.Log(debugModel2.toString());
-                new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);
-                new PickUpChest(this, GameObject.FindGameObjectWithTag("Chest")).ApplyActionEffects(debugModel2);
-                new GetManaPotion(this, GameObject.FindGameObjectWithTag("ManaPotion")).ApplyActionEffects(debugModel2);
+
+
+                currentNewWorldModelDebug.UpdateCurrentStateWorldModel();
+                newWorldModel.UpdateCurrentStateWorldModel();
+                //Debug.Log(debugModel2.toString());
+                //Debug.Log(debugModel2.toString());
+                //new SwordAttack(this, GameObject.FindGameObjectWithTag("Skeleton")).ApplyActionEffects(debugModel2);
+                //new PickUpChest(this, GameObject.FindGameObjectWithTag("Chest")).ApplyActionEffects(debugModel2);
+                //new GetManaPotion(this, GameObject.FindGameObjectWithTag("ManaPotion")).ApplyActionEffects(debugModel2);
                 //debugModel.GetNextAction();
                 //Debug.Log(debugModel.toString());
 

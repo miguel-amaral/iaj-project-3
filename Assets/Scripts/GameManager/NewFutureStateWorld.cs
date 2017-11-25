@@ -12,12 +12,17 @@ namespace Assets.Scripts.GameManager {
 
         public NewFutureStateWorld(GameManager gm, List<Action> actions) :base(gm, actions) {
             this.NextPlayer = 0;
+            //PopulatePossibleActions();
         }
 
         public NewFutureStateWorld(NewFutureStateWorld old) : base(old) {
-
+            //copy stats maybe?
+            //PopulatePossibleActions();
         }
 
+
+
+ 
         public override NewWorldModel GenerateChildWorldModel() {
             return new NewFutureStateWorld(this);
         }
@@ -55,7 +60,32 @@ namespace Assets.Scripts.GameManager {
             //basically if the character is close enough to an enemy, the next player will be the enemy.
             foreach (var enemy in this.gm.enemies) {
                 enemyEnabled = (enemy == null ? false : true);
-                if (enemyEnabled && (enemy.transform.position - position).sqrMagnitude <= 400) {
+                if (!enemyEnabled) {
+                    continue;
+                }
+
+                var s = enemy.name;
+                int index;
+                var worldModel = this;
+                bool enabledOnArray = false;
+
+                if (s.StartsWith("Dragon")) {
+                    s = s.Substring(6);
+                    index = int.Parse(s);
+                    enabledOnArray = worldModel.dragons[index - 1];
+                } else if (s.StartsWith("Skeleton")) {
+                    s = s.Substring(8);
+                    index = int.Parse(s);
+                    enabledOnArray = worldModel.skeletons[index - 1];
+                } else if (s.StartsWith("Orc")) {
+                    s = s.Substring(3);
+                    index = int.Parse(s);
+                    enabledOnArray = worldModel.orcs[index - 1];
+                } else {
+                    Debug.Log("Not valid target");
+                }
+
+                if (enabledOnArray && (enemy.transform.position - position).sqrMagnitude <= 400) {
                     this.NextPlayer = 1;
                     this.NextEnemyAction = new SwordAttack(this.gm.autonomousCharacter, enemy);
                     this.NextEnemyActions = new Action[] { this.NextEnemyAction };
