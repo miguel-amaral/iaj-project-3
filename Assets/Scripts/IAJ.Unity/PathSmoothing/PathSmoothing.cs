@@ -11,11 +11,11 @@ public class PathSmoothing {
     //    _collider = new Collider();
     //}
 
-    public GlobalPath Smooth(Vector3 position, GlobalPath globalPath) {
+    public GlobalPath Smooth( GlobalPath globalPath) {
         globalPath.Smoothed = true;
         GlobalPath toReturn = new GlobalPath();
-        toReturn.PathPositions.Add(position);
-        if(globalPath.PathPositions.Count < 2) {
+
+        if (globalPath.PathPositions.Count < 2) {
             return globalPath;
         }
 

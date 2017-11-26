@@ -6,10 +6,14 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class GetManaPotion : WalkToTargetAndExecuteAction
     {
+        private int indexInList;
+
         public GetManaPotion(AutonomousCharacter character, GameObject target) : base("GetManaPotion",character,target)
         {
             xmlName = target.name;
-
+            var s = this.Target.name;
+            s = s.Substring(10);
+            indexInList = int.Parse(s) - 1;
         }
 
         public override bool CanExecute()
@@ -27,11 +31,15 @@ namespace Assets.Scripts.DecisionMakingActions
         }
 
         public override bool CanExecute(NewWorldModel worldModel) {
-            if (!base.CanExecute(worldModel)) return false;
-
+            if (this.Target == null) {
+                return false;
+            }
             var mana = worldModel.stats.getStat(Stats.mn);
-            
-            return mana < 11;
+
+            if (mana >= 10) {
+                return false;
+            }
+            return worldModel.manaPots[indexInList];
         }
 
 
@@ -54,10 +62,7 @@ namespace Assets.Scripts.DecisionMakingActions
             base.ApplyActionEffects(worldModel);
             worldModel.stats.setStat(Stats.mn, 10);
             //disables the target object so that it can't be reused again
-            var s = this.Target.name;
-            s = s.Substring(10);
-            var index = int.Parse(s);
-            worldModel.manaPots[index - 1] = false;
+            worldModel.manaPots[indexInList] = false;
 
             worldModel.SetLastAction(this);
         }

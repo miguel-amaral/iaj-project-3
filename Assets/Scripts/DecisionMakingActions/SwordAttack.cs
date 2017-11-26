@@ -6,13 +6,30 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class SwordAttack : WalkToTargetAndExecuteAction
     {
-        private int hpChange;
-        private int xpChange;
+        protected int hpChange;
+        protected int xpChange;
+
+        private int indexInList;
+        private int worldModelListNr;
 
         public SwordAttack(AutonomousCharacter character, GameObject target) : base("SwordAttack",character,target)
         {
             xmlName = "Sword " + target.name;
-
+            var s = target.name;
+            
+            if (s.StartsWith("Dragon")) {
+                s = s.Substring(6);
+                indexInList = int.Parse(s)-1;
+                worldModelListNr = 1;
+            } else if (s.StartsWith("Skeleton")) {
+                s = s.Substring(8);
+                indexInList = int.Parse(s) -1;
+                worldModelListNr = 2;
+            } else if (s.StartsWith("Orc")) {
+                s = s.Substring(3);
+                indexInList = int.Parse(s) - 1;
+                worldModelListNr = 3;
+            }
 
             if (target.tag.Equals("Skeleton"))
             {
@@ -75,7 +92,47 @@ namespace Assets.Scripts.DecisionMakingActions
             
         }
 
+        public override bool CanExecute(NewWorldModel worldModel) {
+            if(this.Target == null) {
+                return false;
+            }
+            //else {
+            //    string s = this.Target.name;
+            //    int size = s.Length;
+            //    string name;
+            //    int index;
+            //    if(size == 7) {
+            //      //Dragon
+            //        index = int.Parse(s[6].ToString());
+            //        return worldModel.dragons[index - 1];
+            //    }selse if (size == 10) {
+            //        //Skeletons
+            //        index = int.Parse(s[9].ToString());
+            //        return worldModel.skeletons[index - 1];
+            //    }else if (size == 4) {
+            //        //orcs
+            //        index = int.Parse(s[3].ToString());
+            //        return worldModel.orcs[index - 1];
+            //    } else {
+            //        return false;
+            //    }
+            //}
+            else {
+                if (this.worldModelListNr == 1) {
+                    return worldModel.dragons[indexInList];
+                } else if (this.worldModelListNr == 2) {
+                    return worldModel.skeletons[indexInList];
+                } else if (this.worldModelListNr == 3) {
+                    return worldModel.orcs[indexInList];
+                } else {
+                    return false;
+                }
+            }
+        }
+
         public override void ApplyActionEffects(NewWorldModel worldModel) {
+           
+
             base.ApplyActionEffects(worldModel);
 
             //var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_XP_GOAL);
@@ -95,22 +152,14 @@ namespace Assets.Scripts.DecisionMakingActions
 
 
             //disables the target object so that it can't be reused again
-            string s = Target.name;
-            int index;
-            if (s.StartsWith("Dragon")) {
-                s = s.Substring(6);
-                index = int.Parse(s);
-                worldModel.dragons[index - 1] = false;
-            } else if (s.StartsWith("Skeleton")) {
-                s = s.Substring(8);
-                index = int.Parse(s);
-                worldModel.skeletons[index - 1] = false;
-            } else if (s.StartsWith("Orc")) {
-                s = s.Substring(3);
-                index = int.Parse(s);
-                worldModel.orcs[index - 1] = false;
+            if (this.worldModelListNr == 1) {
+                worldModel.dragons[indexInList] = false;
+            } else if (this.worldModelListNr == 2) {
+                worldModel.skeletons[indexInList] = false;
+            } else if (this.worldModelListNr == 3) {
+                worldModel.orcs[indexInList] = false;
             } else {
-                Debug.Log("Not valid target");  
+                Debug.LogError("Invalid Target Sword Attack");
             }
 
             if(worldModel.GetNextPlayer() == 1) {

@@ -6,10 +6,14 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class PickUpChest : WalkToTargetAndExecuteAction
     {
+        private int indexInList;
 
         public PickUpChest(AutonomousCharacter character, GameObject target) : base("PickUpChest",character,target)
         {
             xmlName = target.name;
+            var s = this.Target.name;
+            s = s.Substring(5);
+            indexInList = int.Parse(s) - 1;
         }
 
 
@@ -33,8 +37,10 @@ namespace Assets.Scripts.DecisionMakingActions
         }
 
         public override bool CanExecute(NewWorldModel worldModel) {
-            if (!base.CanExecute(worldModel)) return false;
-            return true;
+            if (this.Target == null) {
+                return false;
+            }
+            return worldModel.chests[indexInList];            
         }
 
 
@@ -67,10 +73,7 @@ namespace Assets.Scripts.DecisionMakingActions
             worldModel.stats.setStat(Stats.money, money + 5);
 
             //disables the target object so that it can't be reused again
-            var s = this.Target.name;
-            s = s.Substring(5);
-            var index = int.Parse(s);
-            worldModel.chests[index - 1] = false;
+            worldModel.chests[indexInList] = false;
 
             worldModel.SetLastAction(this);
         }

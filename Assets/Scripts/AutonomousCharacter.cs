@@ -298,13 +298,15 @@ namespace Assets.Scripts
                     this.currentSmoothedSolution = this.currentSolution;
 
                     var smoother = new PathSmoothing();
-                    this.currentSmoothedSolution = smoother.Smooth(this.Character.KinematicData.position, this.currentSolution);
+                    this.currentSmoothedSolution = smoother.Smooth(this.currentSolution);
                     this.currentSmoothedSolution.CalculateLocalPathsFromPathPositions(this.Character.KinematicData.position);
+                    var maxSpeed = 50.0f;
 					this.Character.Movement = new DynamicFollowPath(this.Character.KinematicData, this.currentSmoothedSolution)
                     {
                         MaxAcceleration = 200.0f,
-                        MaxSpeed = 40.0f
+                        MaxSpeed = maxSpeed
                     };
+                    this.Character.MaxSpeed = maxSpeed;
                 }
             }
 
@@ -376,11 +378,9 @@ namespace Assets.Scripts
             var targetPosition = target.transform.position;
             if (!this.PreviousTargetPosition.Equals(targetPosition) || this.GameManager.WorldChanged)
             {
-                Debug.Log("Entrei start pathfinding if");
                 this.AStarPathFinding.InitializePathfindingSearch(this.Character.KinematicData.position, targetPosition);
                     PreviousTargetPosition = targetPosition;
                 PreviousTargetName = target.name;
-                Debug.Log(PreviousTargetPosition +"\n" + PreviousTargetName);
             }
         }
 
