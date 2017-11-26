@@ -84,10 +84,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private void recalculateChildPosition(int childIndex, double childNewValue) {
             //needs testing
-
-            //Pair<int,double> old = this.bestNodesSorted
-
+            
+            //not yet with care for when it isnt there yet
+            Pair<int, double> old = this.bestNodesSorted[0];
             this.bestNodesSorted.RemoveAt(0);
+
             int index = 0;
             foreach(var node in bestNodesSorted) {
                 if (childNewValue > node.Second) {
