@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Assets.Scripts.GameManager;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
@@ -53,8 +54,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if(this.Parent != null) {
 
             var firstPart = this.Q / this.N;
-            var secondPart = 1.4f * 400 * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
+            var secondPart = C * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
             toReturn += tabSpaces + " <BestUTC>"+ (firstPart + secondPart)+ "</BestUTC>";
+            toReturn += tabSpaces + " <BestUTC_static_calculated>"+ (utcValue)+ "</BestUTC_static_calculated>";
             } else {
                 toReturn += tabSpaces + " <BestUTC>" + 0 + "</BestUTC>";
             }
@@ -76,27 +78,41 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public void RecalculateUTC() {
             if (this.Parent != null) {
                 var firstPart = this.Q / this.N;
-                var secondPart = C * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
+                //+1 cause backpropagation did not reach parent yet
+                var secondPart = C * Math.Sqrt(Math.Log(this.Parent.N+1) / this.N);
                 utcValue = firstPart + secondPart;
-                //this.Parent.recalculateChildPosition(this.indexInParent, utcValue);
+                this.Parent.recalculateChildPosition(this.indexInParent, utcValue);
             }
         }
 
         private void recalculateChildPosition(int childIndex, double childNewValue) {
             //needs testing
-            
-            //not yet with care for when it isnt there yet
-            Pair<int, double> old = this.bestNodesSorted[0];
-            this.bestNodesSorted.RemoveAt(0);
-
             int index = 0;
+            foreach (var node in bestNodesSorted) {
+                if(node.First == childIndex) {
+                    break;
+                }
+                index++;
+            }
+            if(index == bestNodesSorted.Count) {
+                Debug.LogError("Fuck : " + index);
+            }
+            Pair<int, double> old = this.bestNodesSorted[index];
+            //if(old.First != childIndex) {
+            //    //Debug.LogError("Assertion failed old.First != childIndex");
+            //}
+            this.bestNodesSorted.RemoveAt(index);
+
+            index = 0;
             foreach(var node in bestNodesSorted) {
                 if (childNewValue > node.Second) {
                     break;
                 }
                 index++; 
             }
-            bestNodesSorted.Add(new Pair<int, double>(childIndex, childNewValue));
+
+            old.Second = childNewValue;
+            bestNodesSorted.Insert(index,old);
         }
     }
 }

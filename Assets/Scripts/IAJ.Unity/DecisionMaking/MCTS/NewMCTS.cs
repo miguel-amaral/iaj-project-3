@@ -63,7 +63,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.CurrentIterations = 0;
             this.CurrentIterationsInFrame = 0;
             this.CurrentStateWorldModel.Initialize();
-            this.InitialNode = new NewMCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel())
+            this.InitialNode = new NewMCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel(),0)
             {
                 Action = null,
                 Parent = null,
@@ -105,7 +105,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (CurrentIterations >= MaxIterations)
             {
                 InProgress = false;
-                //printXMLTree(rootNode);
+                printXMLTree(rootNode);
 
                 List<GOB.Action> temp = new List<GOB.Action>();
                 var currNode = rootNode;
@@ -183,7 +183,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 node.N++;
                 node.Q += reward.Value;
                 node.RecalculateUTC();
-                NumberDivisionBackpropagate++;
+                //NumberDivisionBackpropagate++;
                 node = node.Parent;
             }
         }
@@ -204,6 +204,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 Q = 0f,
             };
             parent.ChildNodes.Add(child);
+            parent.bestNodesSorted.Insert(childIndex, new Pair<int, double>(childIndex, double.MinValue));
             return child;          
         }
 
@@ -212,8 +213,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             NewMCTSNode best = null;
             var bestUCT = double.MinValue;
+            int index = 0;
+            int bestIndex = 0;
             foreach (var nodeChildNode in node.ChildNodes)
             {
+            
                 //this.NumberDivisionSelection++;
                 //var firstPart = nodeChildNode.Q / nodeChildNode.N;
                 //var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
@@ -222,8 +226,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 {
                     bestUCT = sum;
                     best = nodeChildNode;
+                    bestIndex = index;
                 }
+                index++;
             }
+
+            ////int bestChildIndex = node.bestNodesSorted[0].First;
+            ////best = node.ChildNodes[bestChildIndex];
+
+
+            //if (pair.First != bestIndex) {
+            //    Debug.LogError("Assertion Failed pair.First != bestIndex");
+            //}
+            //if (pair.Second  != bestUCT) {
+            //    Debug.LogError("Assertion Failed pair.Second != bestUCT");
+            //}
+            
+
             return best;
         }
 
