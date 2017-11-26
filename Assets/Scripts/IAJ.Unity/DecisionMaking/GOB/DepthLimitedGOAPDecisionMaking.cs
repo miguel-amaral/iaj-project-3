@@ -16,6 +16,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         public bool InProgress { get; set; }
         public float ParcialProcessingTime { get; private set; }
 
+        public int NumberDivisionSelection { get; private set; }
+        public int NumberDivisionBackpropagate { get; private set; }
+
+
         public CurrentStateWorldModel InitialWorldModel { get; set; }
         private List<Goal> Goals { get; set; }
         private WorldModel[] Models { get; set; }

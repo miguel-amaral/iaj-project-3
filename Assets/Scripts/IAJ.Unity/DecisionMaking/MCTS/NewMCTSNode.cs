@@ -8,6 +8,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class NewMCTSNode
     {
+        public const float C = 1.4f;// * 525;
+        
         public NewWorldModel State { get; private set; }
         public NewMCTSNode Parent { get; set; }
         public GOB.Action Action { get; set; }
@@ -15,12 +17,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public List<NewMCTSNode> ChildNodes { get; private set; }
         public int N { get; set; }
         public float Q { get; set; }
+        public double utcValue { get; private set; }
+        public int bestChildIndex;
+        public int indexInParent;
+        public List<Pair<int, double>> bestNodesSorted ;
 
 
-        public NewMCTSNode(NewWorldModel state)
+        public NewMCTSNode(NewWorldModel state,int indexInParent)
         {
             this.State = state;
             this.ChildNodes = new List<NewMCTSNode>();
+                                        // index of children, utcOfChildren
+            this.bestNodesSorted = new List<Pair<int, double>>();
+            this.indexInParent = indexInParent;
         }
 
         public string ToXML(int depth) {
@@ -62,6 +71,31 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 toReturn += node.RecursiveNumberOfChilds();
             }
             return toReturn;
+        }
+
+        public void RecalculateUTC() {
+            if (this.Parent != null) {
+                var firstPart = this.Q / this.N;
+                var secondPart = C * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
+                utcValue = firstPart + secondPart;
+                //this.Parent.recalculateChildPosition(this.indexInParent, utcValue);
+            }
+        }
+
+        private void recalculateChildPosition(int childIndex, double childNewValue) {
+            //needs testing
+
+            //Pair<int,double> old = this.bestNodesSorted
+
+            this.bestNodesSorted.RemoveAt(0);
+            int index = 0;
+            foreach(var node in bestNodesSorted) {
+                if (childNewValue > node.Second) {
+                    break;
+                }
+                index++; 
+            }
+            bestNodesSorted.Add(new Pair<int, double>(childIndex, childNewValue));
         }
     }
 }

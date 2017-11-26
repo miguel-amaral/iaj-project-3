@@ -17,7 +17,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
-
+        public int NumberDivisionSelection { get; private set; }
+        public int NumberDivisionBackpropagate { get; private set; }
+        
         public float PlayoutNodes { get; private set; }
 
         public float ParcialProcessingTime { get; private set; }
@@ -138,17 +140,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (nextAction != null) {
                     return Expand(currentNode, nextAction);
                 } else {
-                    
-                    if (currentNode.ChildNodes.Count == 0) {
-                        //DEBUG CODE
-                        string xmlTree = initialNode.ToXML(0);
-                        int numero = initialNode.RecursiveNumberOfChilds();
-                        System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
-                        Debug.Log("Escrita Arvore");
-                        Debug.Log("Arvore nos : " + numero);
-                    } else {
-                        currentNode = BestUCTChild(currentNode);
-                    }
+                    currentNode = BestUCTChild(currentNode);
                 }
             }
 
@@ -190,6 +182,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             while(node != null) {
                 node.N++;
                 node.Q += reward.Value;
+                node.RecalculateUTC();
+                NumberDivisionBackpropagate++;
                 node = node.Parent;
             }
         }
@@ -199,7 +193,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             NewWorldModel childModel = parent.State.GenerateChildWorldModel();
             action.ApplyActionEffects(childModel);
             childModel.CalculateNextPlayer();
-            NewMCTSNode child = new NewMCTSNode(childModel) {
+
+            //size before insert
+            var childIndex = parent.ChildNodes.Count;
+            NewMCTSNode child = new NewMCTSNode(childModel,childIndex) {
                 Parent = parent,
                 PlayerID = childModel.GetNextPlayer(),
                 Action = action,
@@ -217,9 +214,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var bestUCT = double.MinValue;
             foreach (var nodeChildNode in node.ChildNodes)
             {
-                var firstPart = nodeChildNode.Q / nodeChildNode.N;
-                var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
-                var sum = firstPart + secondPart;
+                //this.NumberDivisionSelection++;
+                //var firstPart = nodeChildNode.Q / nodeChildNode.N;
+                //var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
+                var sum = nodeChildNode.utcValue;//firstPart + secondPart;
                 if (sum > bestUCT)
                 {
                     bestUCT = sum;
@@ -244,9 +242,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 {
                     bestUCT = firstPart;
                     best = nodeChildNode;
-                }else if(Math.Abs(bestUCT -firstPart) < 0.001) {
-                    Debug.Log("Muito parecido"); 
                 }
+                //else if(Math.Abs(bestUCT -firstPart) < 0.001) {
+                //    Debug.Log("Muito parecido"); 
+                //}
             }
             return best;
         }

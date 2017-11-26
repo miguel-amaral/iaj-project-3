@@ -17,6 +17,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
+        public int NumberDivisionSelection { get; private set; }
+        public int NumberDivisionBackpropagate { get; private set; }
+        
+
 
         public float PlayoutNodes { get; private set; }
 

@@ -38,6 +38,7 @@ namespace Assets.Scripts
         public Text BestDiscontentmentText;
         public Text ProcessedActionsText;
         public Text BestActionText;
+        public Text RaveValueText;
         public bool MCTSActive;
 
 
@@ -50,6 +51,8 @@ namespace Assets.Scripts
         public Action CurrentAction { get; private set; }
         public DynamicCharacter Character { get; private set; }
         public DecisionMakingBase GOAPDecisionMaking { get; set; }
+
+        public int NumberDivisions = 0;
 
         public AStarPathfinding AStarPathFinding;
         private PathSmoothing pathSmoothing = new PathSmoothing();
@@ -354,6 +357,8 @@ namespace Assets.Scripts
                 }
                 //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
                 //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
+
+                this.RaveValueText.text = "Divisions: " + GOAPDecisionMaking.NumberDivisionSelection + " : " + GOAPDecisionMaking.NumberDivisionBackpropagate;
 
                 if (this.GOAPDecisionMaking.BestAction != null) {
                     var actionText = "";
