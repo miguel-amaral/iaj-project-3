@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
@@ -7,7 +8,10 @@ using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 using Assets.Scripts.IAJ.Unity.Utils;
 using RAIN.Navigation.NavMesh;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Path = System.IO.Path;
 
 //using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.HPStructures;
 
@@ -34,45 +38,71 @@ namespace Assets.Editor
 
             var pathsmoother = new PathSmoothing();
 
-            var ourGameObjects = OurGameObjects();
+            var paths = GetScenePaths();
 
-            int progress = 0;
+            //for (var i = 0; i < paths.Count; i++)
+            //{
+            //    var scenePath = paths[i];
+            //    Debug.Log(scenePath);
+            //    //EditorSceneManager.OpenScene(scenePath);
 
-            foreach (var ourGameObject in ourGameObjects)
-            {
-                foreach (var otherOurGameObject in ourGameObjects)
+
+                var ourGameObjects = OurGameObjects();
+
+                int progress = 0;
+
+                foreach (var ourGameObject in ourGameObjects)
                 {
-                    progress++;
-                    if (progress % 5 == 0)
+                    foreach (var otherOurGameObject in ourGameObjects)
                     {
-                        float percentage = (float)progress / (float)(2 * ourGameObjects.Count());
+                        progress++;
+                        if (progress % 5 == 0)
+                        {
+                            var percentage = (float) progress / (float) (2 * ourGameObjects.Length);
 
-                        EditorUtility.DisplayProgressBar("Heuristic precomputation progress",
-                            "Calculating distance for each object", percentage);
+                            EditorUtility.DisplayProgressBar("Heuristic precomputation progress",
+                                "Calculating distance for each object", percentage);
+                        }
+
+                        if (ourGameObject.name.Equals(otherOurGameObject.name))
+                        {
+                            table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
+                            continue;
+                        }
+
+                        goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position,
+                            otherOurGameObject.transform.position);
+                        GlobalPath solution;
+                        goalBoundingPathfinding.Search(out solution);
+                        solution = pathsmoother.Smooth(solution);
+                        table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name),
+                            solution.PathLength());
+                        goalBoundingPathfinding.CleanUp();
                     }
-
-                    if (ourGameObject.name.Equals(otherOurGameObject.name))
-                    {
-                        table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
-                        continue;
-                    }
-
-                    goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position,
-                        otherOurGameObject.transform.position);
-                    GlobalPath solution;
-                    goalBoundingPathfinding.Search(out solution);
-                    solution = pathsmoother.Smooth(solution);
-                    table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), solution.PathLength());
-                    goalBoundingPathfinding.CleanUp();
                 }
-            }
-            OfflineTableHeuristic.SaveTable(table);
-            EditorUtility.ClearProgressBar();
+                OfflineTableHeuristic.SaveTable(table, EditorSceneManager.GetActiveScene().name);
+                EditorUtility.ClearProgressBar();
+            //}
 
         }
 
 
-        private static IEnumerable<GameObject> OurGameObjects()
+        private static List<string> GetScenePaths()
+        {
+            //var path = GoalBoundingTable.Path() + "/Scenes";
+            //var dir = new DirectoryInfo(path);
+            //return (from fileInfo in dir.GetFiles() where fileInfo.Name.EndsWith(".unity") select (path + "/" + fileInfo.Name)).ToList();
+            
+
+            return new List<string>
+            {
+                EditorSceneManager.GetActiveScene().path,
+            };
+        }
+
+
+
+        private static GameObject[] OurGameObjects()
         {
             var hPots = GameObject.FindGameObjectsWithTag("HealthPotion");
             var mPots = GameObject.FindGameObjectsWithTag("ManaPotion");
@@ -81,7 +111,7 @@ namespace Assets.Editor
             var skeletons = GameObject.FindGameObjectsWithTag("Skeleton");
             var dragons = GameObject.FindGameObjectsWithTag("Dragon");
             var player = GameObject.FindGameObjectsWithTag("Player");
-            return hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons).Concat(player);
+            return hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons).Concat(player).ToArray();
         }
     }
 }

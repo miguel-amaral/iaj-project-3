@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Utils;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics
 {
@@ -48,7 +49,7 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics
             // We will assume a default name here
 
             string assetPathAndName =
-                GoalBoundingTable.Path() + "/" + typeof(OfflineTableHeuristic).Name + ".bin";
+                GoalBoundingTable.Path() + "/" + SceneManager.GetActiveScene().name + "_heuristic.bin";
 
             using (Stream stream =
                 new FileStream(assetPathAndName, FileMode.Open, FileAccess.Read, FileShare.None))
@@ -59,12 +60,12 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics
 
         }
 
-        public static void SaveTable(SerializableDictionary<Pair<string, string>, float> table)
+        public static void SaveTable(SerializableDictionary<Pair<string, string>, float> table, string currentSceneName)
         {
             if(table == null) return;
             string assetPathAndName =
                 AssetDatabase.GenerateUniqueAssetPath(GoalBoundingTable.Path() + "/" +
-                                                      typeof(OfflineTableHeuristic).Name + ".bin");
+                                                      currentSceneName + "_heuristic.bin");
 
             using (Stream stream = new FileStream(assetPathAndName, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -74,32 +75,5 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics
 
         }
 
-        //private List<Pair<string, Vector3>> _ourGameObjects;
-
-        //public List<Pair<string, Vector3>> OurGameObjects()
-        //{
-        //    if (_ourGameObjects == null)
-        //    {
-        //        InitGameObjects();
-        //    }
-        //    return _ourGameObjects;
-        //}
-
-        //private void InitGameObjects()
-        //{
-        //    var hPots = GameObject.FindGameObjectsWithTag("HealthPotion");
-        //    var mPots = GameObject.FindGameObjectsWithTag("ManaPotion");
-        //    var chests = GameObject.FindGameObjectsWithTag("Chest");
-        //    var orcs = GameObject.FindGameObjectsWithTag("Orc");
-        //    var skeletons = GameObject.FindGameObjectsWithTag("Skeleton");
-        //    var dragons = GameObject.FindGameObjectsWithTag("Dragon");
-        //    var ourGameObjects = hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons)
-        //        .ToList();
-        //    _ourGameObjects = new List<Pair<string, Vector3>>();
-        //    foreach (var ourGameObject in ourGameObjects)
-        //    {
-        //        _ourGameObjects.Add(new Pair<string, Vector3>(ourGameObject.name, ourGameObject.transform.position));
-        //    }
-        //}
     }
 }
