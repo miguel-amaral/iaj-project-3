@@ -38,69 +38,42 @@ namespace Assets.Editor
 
             var pathsmoother = new PathSmoothing();
 
-            var paths = GetScenePaths();
+            var ourGameObjects = OurGameObjects();
 
-            //for (var i = 0; i < paths.Count; i++)
-            //{
-            //    var scenePath = paths[i];
-            //    Debug.Log(scenePath);
-            //    //EditorSceneManager.OpenScene(scenePath);
+            var progress = 0;
 
-
-                var ourGameObjects = OurGameObjects();
-
-                int progress = 0;
-
-                foreach (var ourGameObject in ourGameObjects)
-                {
-                    foreach (var otherOurGameObject in ourGameObjects)
-                    {
-                        progress++;
-                        if (progress % 5 == 0)
-                        {
-                            var percentage = (float) progress / (float) (2 * ourGameObjects.Length);
-
-                            EditorUtility.DisplayProgressBar("Heuristic precomputation progress",
-                                "Calculating distance for each object", percentage);
-                        }
-
-                        if (ourGameObject.name.Equals(otherOurGameObject.name))
-                        {
-                            table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
-                            continue;
-                        }
-
-                        goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position,
-                            otherOurGameObject.transform.position);
-                        GlobalPath solution;
-                        goalBoundingPathfinding.Search(out solution);
-                        solution = pathsmoother.Smooth(solution);
-                        table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name),
-                            solution.PathLength());
-                        goalBoundingPathfinding.CleanUp();
-                    }
-                }
-                OfflineTableHeuristic.SaveTable(table, EditorSceneManager.GetActiveScene().name);
-                EditorUtility.ClearProgressBar();
-            //}
-
-        }
-
-
-        private static List<string> GetScenePaths()
-        {
-            //var path = GoalBoundingTable.Path() + "/Scenes";
-            //var dir = new DirectoryInfo(path);
-            //return (from fileInfo in dir.GetFiles() where fileInfo.Name.EndsWith(".unity") select (path + "/" + fileInfo.Name)).ToList();
-            
-
-            return new List<string>
+            foreach (var ourGameObject in ourGameObjects)
             {
-                EditorSceneManager.GetActiveScene().path,
-            };
+                foreach (var otherOurGameObject in ourGameObjects)
+                {
+                    progress++;
+                    if (progress % 5 == 0)
+                    {
+                        var percentage = (float) progress / (float) (2 * ourGameObjects.Length);
+
+                        EditorUtility.DisplayProgressBar("Heuristic precomputation progress",
+                            "Calculating distance for each object", percentage);
+                    }
+
+                    if (ourGameObject.name.Equals(otherOurGameObject.name))
+                    {
+                        table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
+                        continue;
+                    }
+
+                    goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position,
+                        otherOurGameObject.transform.position);
+                    GlobalPath solution;
+                    goalBoundingPathfinding.Search(out solution);
+                    solution = pathsmoother.Smooth(solution);
+                    table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name),
+                        solution.PathLength());
+                    goalBoundingPathfinding.CleanUp();
+                }
+            }
+            OfflineTableHeuristic.SaveTable(table, EditorSceneManager.GetActiveScene().name);
+            EditorUtility.ClearProgressBar();
         }
-
-
 
         private static GameObject[] OurGameObjects()
         {
