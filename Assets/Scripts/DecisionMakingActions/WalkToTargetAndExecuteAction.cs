@@ -15,15 +15,20 @@ namespace Assets.Scripts.DecisionMakingActions
     public abstract class WalkToTargetAndExecuteAction : Action
     {
         private const float RadiusOfDetection = 9f;
-
+        public string target_name { get; protected set; }
         protected AutonomousCharacter Character { get; set; }
 
         public GameObject Target { get; protected set; }
+
+        protected WalkToTargetAndExecuteAction(string target_name) : base("JEBAIT"){
+            this.target_name = target_name;
+        }
 
         protected WalkToTargetAndExecuteAction(string actionName, AutonomousCharacter character, GameObject target) : base(actionName + "(" + target.name + ")")
         {
             this.Character = character;
             this.Target = target;
+            this.target_name = target.name;
         }
 
         public override float GetDuration()
@@ -42,26 +47,28 @@ namespace Assets.Scripts.DecisionMakingActions
             return this.GetDuration(position,worldModel.GetLastAction());
         }
 
-        private float GetDuration(Vector3 currentPosition, Action action) {
+        private float GetDuration(Vector3 currentPosition, Action previousAction) {
             string targetName;
-            if(action == null) {
+            if(previousAction == null) {
                 targetName = "Character";
             } else {
-                var walkToTargetAndExecuteAction = action as WalkToTargetAndExecuteAction;
+                var walkToTargetAndExecuteAction = previousAction as WalkToTargetAndExecuteAction;
                 if (walkToTargetAndExecuteAction == null) {
                     return 0;
                 }
-                targetName = walkToTargetAndExecuteAction.Target.name;
+                targetName = walkToTargetAndExecuteAction.target_name;
             }
 
             float distance;
             var heuristic = OfflineTableHeuristic.Instance;
 
             if (heuristic.GotEntry(targetName, Target.gameObject.name)) {
+                //Debug.Log("" + targetName + " : " + Target.gameObject.name);
                 distance = heuristic.H(targetName, Target.gameObject.name);
             } else {
                 distance = (this.Target.transform.position - currentPosition).magnitude;
             }
+            //Debug.Log(distance / this.Character.Character.MaxSpeed);
             return distance / this.Character.Character.MaxSpeed;
         }
 
@@ -167,7 +174,6 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override void ApplyActionEffects(WorldModel worldModel)
         {
-            worldModel.SetProperty(Properties.POSITION, Target.transform.position);
             var duration = this.GetDuration(worldModel);
 
             var quicknessValue = worldModel.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
@@ -175,11 +181,11 @@ namespace Assets.Scripts.DecisionMakingActions
 
             var time = (float)worldModel.GetProperty(Properties.TIME);
             worldModel.SetProperty(Properties.TIME, time + duration);
+            worldModel.SetProperty(Properties.POSITION, Target.transform.position);
 
         }
 
         public override void ApplyActionEffects(NewWorldModel worldModel) {
-            worldModel.stats.setPosition(Target.transform.position);
 
             var duration = this.GetDuration(worldModel);
 
@@ -193,6 +199,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
             //Debug.Log(time + " -> " + worldModel.stats.getTime());
             //worldModel.SetProperty(Properties.POSITION, Target.transform.position);
+            worldModel.stats.setPosition(Target.transform.position);
             
         }
 

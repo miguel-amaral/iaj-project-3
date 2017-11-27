@@ -6,8 +6,8 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class SwordAttack : WalkToTargetAndExecuteAction
     {
-        protected int hpChange;
-        protected int xpChange;
+        public int hpChange;
+        public int xpChange;
 
         private int indexInList;
         private int worldModelListNr;
@@ -163,6 +163,7 @@ namespace Assets.Scripts.DecisionMakingActions
             }
 
             if(worldModel.GetNextPlayer() == 1) {
+                //Debug.Log("Sou burro");
                 if (worldModel.IsTerminal()) {
                     worldModel.RemoveLastActionEffect();
                 }

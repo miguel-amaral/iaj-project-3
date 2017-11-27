@@ -67,7 +67,7 @@ namespace Assets.Resources.Editor
                         otherOurGameObject.transform.position);
                     GlobalPath solution;
                     goalBoundingPathfinding.Search(out solution);
-                    solution = pathsmoother.Smooth(solution);
+                    // solution = pathsmoother.Smooth(solution);
                     table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), solution.PathLength());
                     goalBoundingPathfinding.CleanUp();
                 }

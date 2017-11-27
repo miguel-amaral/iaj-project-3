@@ -18,6 +18,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             this.Name = name;
             this.GoalEffects = new Dictionary<Goal, float>();
         }
+      
 
         public void AddEffect(Goal goal, float goalChange)
         {

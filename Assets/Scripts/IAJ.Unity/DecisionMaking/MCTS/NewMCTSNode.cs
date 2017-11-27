@@ -38,13 +38,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 toReturn += tabSpaces + " <Action> " + this.Action.xmlName+ " </Action>";
             }
             toReturn += tabSpaces + " <N>" +(int)N +"</N>";
-            toReturn += tabSpaces + " <Q>" + (int)Q + "</Q>";
+            toReturn += tabSpaces + " <Q>" + Q + "</Q>";
             toReturn += tabSpaces + " <Q_N_div>"+ (Q / N) + "</Q_N_div>";
             toReturn += tabSpaces + " <Terminal>"+ State.IsTerminal() + "</Terminal>";
             if(this.Parent != null) {
 
             var firstPart = this.Q / this.N;
-            var secondPart = 1.4f * 400 * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
+            var secondPart = NewMCTS.C * Math.Sqrt(Math.Log(this.Parent.N) / this.N);
             toReturn += tabSpaces + " <BestUTC>"+ (firstPart + secondPart)+ "</BestUTC>";
             } else {
                 toReturn += tabSpaces + " <BestUTC>" + 0 + "</BestUTC>";

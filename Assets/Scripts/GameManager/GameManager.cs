@@ -4,6 +4,8 @@ using System.Linq;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
+using Assets.Scripts.DecisionMakingActions;
 
 namespace Assets.Scripts.GameManager
 {
@@ -44,7 +46,9 @@ namespace Assets.Scripts.GameManager
         private float nextUpdateTime = 0.0f;
         private Vector3 previousPosition;
 
-        
+        public Action LastAction = null;
+
+        private JeBaitAction container;
 
         public void Start()
         {
@@ -68,6 +72,9 @@ namespace Assets.Scripts.GameManager
             TopCamera.enabled = true;
             PlayerCamera.enabled = false;
             var offlineTableHeuristic = OfflineTableHeuristic.Instance; // just to initialize singleton
+
+            container = new JeBaitAction("Character");
+            LastAction = container;
         }
 
         public void Update()
@@ -84,6 +91,7 @@ namespace Assets.Scripts.GameManager
                 this.enemyCharacter.Movement.Target.position = this.character.transform.position;
                 this.enemyCharacter.Update();
                 this.SwordAttack(currentEnemy);
+                
             }
             else
             {
@@ -138,6 +146,8 @@ namespace Assets.Scripts.GameManager
             if (enemy != null && enemy.activeSelf && InMeleeRange(enemy))
             {
 
+                container.RenameTargetName(enemy.name);
+
                 //foreach(var i in debugEnemies) {
                 //    Debug.Log(i);
                 //}
@@ -178,6 +188,8 @@ namespace Assets.Scripts.GameManager
         {
             if (enemy != null && enemy.activeSelf && InFireballRange(enemy) && this.characterData.Mana >= 5)
             {
+                container.RenameTargetName(enemy.name);
+
                 //foreach (var i in debugEnemies) {
                 //    Debug.Log(i);
                 //}
@@ -219,6 +231,7 @@ namespace Assets.Scripts.GameManager
             //Debug.Log(InChestRange(chest));
             if (chest != null && chest.activeSelf && InChestRange(chest))
             {
+                container.RenameTargetName(chest.name);
 
 
 
@@ -259,6 +272,8 @@ namespace Assets.Scripts.GameManager
         {
             if (manaPotion != null && manaPotion.activeSelf && InPotionRange(manaPotion))
             {
+                container.RenameTargetName(manaPotion.name);
+
                 GameObject.DestroyObject(manaPotion);
                 this.characterData.Mana = 10;
                 this.WorldChanged = true;
@@ -269,6 +284,7 @@ namespace Assets.Scripts.GameManager
         {
             if (potion != null && potion.activeSelf && InPotionRange(potion))
             {
+                container.RenameTargetName(potion.name);
                 GameObject.DestroyObject(potion);
                 this.characterData.HP = this.characterData.MaxHP;
                 this.WorldChanged = true;

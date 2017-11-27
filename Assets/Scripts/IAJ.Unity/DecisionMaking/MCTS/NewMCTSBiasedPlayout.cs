@@ -18,14 +18,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
         private const int LevelWeight = 500;
         private const int PositionWeight = 0;
 
-        private Dictionary<string, List<string>> chestInfo;
+        
+        private Dictionary<string, List<Pair<int, int>>> chestInfo;
+        private Dictionary<string, List<int>> enemiesRewards;
+
         //public MCTSBiasedPlayout(CurrentStateWorldModel currentStateWorldModel) : base(currentStateWorldModel)
         //{
         //}
 
-        public NewMCTSBiasedPlayout(NewCurrentStateWorldModel currentStateWorldModel, Dictionary<string, List<string>> chestInfo)
-            :base(currentStateWorldModel){
+        public NewMCTSBiasedPlayout(NewCurrentStateWorldModel currentStateWorldModel, Dictionary<string, List<Pair<int, int>>> chestInfo, Dictionary<string, List<int>> enemiesRewards) : base(currentStateWorldModel) {
             this.chestInfo = chestInfo;
+            this.enemiesRewards = enemiesRewards;
         }
 
         protected override Action GuidedAction(NewWorldModel currentPlayoutState) {
@@ -42,18 +45,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
             var lvl = currentPlayoutState.stats.getStat(Stats.lvl);
             var position = currentPlayoutState.stats.getPosition();
 
-            var enemiesNumber = currentPlayoutState.enemiesAlive;
+            //var enemiesNumber = currentPlayoutState.enemiesAlive;
             
 
+            //var goodChest = false;
             foreach (var executableAction in currentPlayoutState.GetExecutableActions()) {
-                   
 
 
                 var sum = 5;
-                //if(executableAction)
-                //if (executableAction.Name.Contains("Chest")) {
-                //    var chestAction = executableAction as PickUpChest;
-
+                //var chestAction = executableAction as PickUpChest;
+                //if (chestAction != null) {
+                //
                 //    List<string> value;
                 //    if (!chestInfo.TryGetValue(chestAction.Target.name, out value)) {
                 //        Debug.Log("This shouldn't happen, bias");
@@ -84,12 +86,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
                 //        }
                 //        if (alive) {
                 //            alone = false;
+                //            break;
                 //        }
                 //    }
-
+                //
                 //    if (alone) {
                 //        //Debug.Log("Entrei aqui");
-                //        return executableAction;
+                //        //goodChest = true;
+                //        sum += 5000;
+                //        //return executableAction;
                 //    }
                 //}
 
@@ -98,7 +103,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
                     return executableAction;
                 }
 
-                if (enemiesNumber == 0) {
+                if (currentPlayoutState.enemiesAlive == 0) {
                     var hpAction = executableAction as GetHealthPotion;
                     var mpAction = executableAction as GetManaPotion;
                     if(hpAction != null || mpAction != null) {
@@ -116,7 +121,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
                 //}
 
                 var swordAction = executableAction as SwordAttack;
-                if (hp<=5 && swordAction != null) {
+                if (swordAction != null && hp + swordAction.hpChange <= 0 ) {
                     continue;
                 }
                 //private bool CheckRange(GameObject obj, float maximumSqrDistance) {

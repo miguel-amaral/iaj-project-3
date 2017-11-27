@@ -10,6 +10,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public LevelUp(AutonomousCharacter character) : base("LevelUp")
         {
+            this.xmlName = "LevelUp";
             this.Character = character;
         }
 

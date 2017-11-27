@@ -12,9 +12,13 @@ namespace Assets.Scripts.GameManager {
         public void Initialize() {
             //this.ActionEnumerator.Reset();
         }
-        public NewCurrentStateWorldModel(GameManager gm, List<Action> actions): base(gm, actions) {
+        public NewCurrentStateWorldModel(GameManager gm, List<Action> actions, Dictionary<string, List<IAJ.Unity.DecisionMaking.MCTS.Pair<int, int>>> chestInfo, Dictionary<string, List<int>> enemiesRewards) :
+                                            base(gm, actions, chestInfo, enemiesRewards) {
             copyStats(gm);
             this.stats = new Stats(gm);
+
+
+
             //PopulatePossibleActions();
         }
 
@@ -55,6 +59,7 @@ namespace Assets.Scripts.GameManager {
 
         public void UpdateCurrentStateWorldModel() {
             copyStats(this.gm);
+            this.LastAction = gm.LastAction;
         }
 
 

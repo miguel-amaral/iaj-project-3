@@ -10,7 +10,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class NewMCTS : DecisionMakingBase
     {
-        public const float C = 1.4f;// * 525;
+        public const float C = 1.4f * 525;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
@@ -39,7 +39,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 10000;
+            this.MaxIterations = 50000;
             this.MaxIterationsProcessedPerFrame = 400;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
@@ -148,6 +148,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         Debug.Log("Arvore nos : " + numero);
                     } else {
                         currentNode = BestUCTChild(currentNode);
+
                     }
                 }
             }
@@ -156,16 +157,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         private Reward Playout(NewWorldModel currentPlayoutState) {
+            var childModel = currentPlayoutState.GenerateChildWorldModel();
             while (!currentPlayoutState.IsTerminal()) {
                 this.PlayoutNodes++;
                 var action = GuidedAction(currentPlayoutState);
                 if(action == null) {
                     return new Reward {
                         PlayerID = currentPlayoutState.GetNextPlayer(),
-                        Value = 0
+                        Value = currentPlayoutState.GetScore()
                     };
                 }
-                var childModel = currentPlayoutState.GenerateChildWorldModel();
+                childModel.FakeGenerateChildWorldModelForPlayout();
                 action.ApplyActionEffects(childModel);
                 childModel.CalculateNextPlayer();
                 currentPlayoutState = childModel;
@@ -217,11 +219,27 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var bestUCT = double.MinValue;
             foreach (var nodeChildNode in node.ChildNodes)
             {
+                if (nodeChildNode.State.defeat) {
+                    continue;
+                }
+
                 var firstPart = nodeChildNode.Q / nodeChildNode.N;
                 var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
                 var sum = firstPart + secondPart;
                 if (sum > bestUCT)
                 {
+                    bestUCT = sum;
+                    best = nodeChildNode;
+                }
+            }
+            if (best != null) {
+                return best;
+            }
+            foreach (var nodeChildNode in node.ChildNodes) {
+                var firstPart = nodeChildNode.Q / nodeChildNode.N;
+                var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
+                var sum = firstPart + secondPart;
+                if (sum > bestUCT) {
                     bestUCT = sum;
                     best = nodeChildNode;
                 }

@@ -86,9 +86,8 @@ namespace Assets.Scripts
 			this.characterAnimator = this.GetComponentInChildren<Animator> ();
         }
 
-        public void Start()
-        {
-            
+        public void Start() {
+
 
             this.draw = true;
 
@@ -96,7 +95,7 @@ namespace Assets.Scripts
             this.Character = new DynamicCharacter(this.gameObject);
 
             //initialize your pathfinding algorithm here!
-       		//use goalBoundingPathfinding for a more efficient algorithm
+            //use goalBoundingPathfinding for a more efficient algorithm
             goalBoundTable = ScriptableObject.CreateInstance<GoalBoundingTable>();
             goalBoundTable.LoadOptimized();
             GoalBoundingPathfinding goalBoundingPathfinding = new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclidianHeuristic(), goalBoundTable);
@@ -104,23 +103,20 @@ namespace Assets.Scripts
 
             //initialization of the GOB decision making
             //let's start by creating 4 main goals
-            
+
             this.SurviveGoal = new Goal(SURVIVE_GOAL, 2.0f);
 
-            this.GainXPGoal = new Goal(GAIN_XP_GOAL, 5.0f)
-            {
+            this.GainXPGoal = new Goal(GAIN_XP_GOAL, 5.0f) {
                 InsistenceValue = 5.0f,
                 ChangeRate = 0.5f
             };
 
-            this.GetRichGoal = new Goal(GET_RICH_GOAL, 1.0f)
-            {
+            this.GetRichGoal = new Goal(GET_RICH_GOAL, 1.0f) {
                 InsistenceValue = 5.0f,
                 ChangeRate = 0.2f
             };
 
-            this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 1.0f)
-            {
+            this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 1.0f) {
                 ChangeRate = 0.1f
             };
 
@@ -140,50 +136,75 @@ namespace Assets.Scripts
             var Dragons = GameObject.FindGameObjectsWithTag("Dragon");
             var enemies = (Skeletons.Concat(Orcs).Concat(Dragons)).ToArray();
 
-            Dictionary<string, List<string>> chestInfo = new Dictionary<string, List<string>>();
-            
+            Dictionary<string, List<Pair<int,int>>> chestInfo = new Dictionary<string, List<Pair<int, int>>>();
+            Dictionary<string, List<int>> enemiesRewards = new Dictionary<string, List<int>>();
+
+            foreach (var enemy in enemies.ToArray()) {
+                enemiesRewards[enemy.name] = new List<int>();
+            }
+
+
 
             foreach (var chest in GameObject.FindGameObjectsWithTag("Chest")) {
                 this.Actions.Add(new PickUpChest(this, chest));
 
                 //MCTSBIASED STUFF
-                List<string> chestEnemies = new List<string>();
+                List<Pair<int, int>> chestEnemies = new List<Pair<int, int>>(); 
                 var chestPosition = chest.transform.position;
+
+                var chest_name = chest.name;
+                chest_name = chest_name.Substring(5);
+                int indexInListChest = int.Parse(chest_name) - 1;
+
                 foreach (var enemy in enemies.ToArray()) {
-                    //Debug.Log(enemy);
-                    if((enemy.transform.position - chestPosition).sqrMagnitude <= 400) {
-                        chestEnemies.Add(enemy.name);
+                    
+                    if ((enemy.transform.position - chestPosition).sqrMagnitude <= 400) {
+
+                        
+                        var enemy_name = enemy.name;
+                        int index_in_list_enemy = 0;
+                        int type_of_enemy = 0;
+                        if (enemy.CompareTag("Dragon")) {
+                            enemy_name = enemy_name.Substring(6);
+                            index_in_list_enemy = int.Parse(enemy_name);
+                            type_of_enemy = 1;
+                        } else if (enemy.CompareTag("Skeleton")) {
+                            enemy_name = enemy_name.Substring(8);
+                            index_in_list_enemy = int.Parse(enemy_name);
+                            type_of_enemy = 2;
+                        } else if (enemy.CompareTag("Orc")) {
+                            enemy_name = enemy_name.Substring(3);
+                            index_in_list_enemy = int.Parse(enemy_name);
+                            type_of_enemy = 3;
+                        } else {
+                            continue;
+                        }
+                        chestEnemies.Add(new Pair<int, int>(type_of_enemy, index_in_list_enemy - 1));
+                        enemiesRewards[enemy.name].Add(indexInListChest);
                     }
                 }
                 chestInfo.Add(chest.name, chestEnemies);
-                
-
             }
 
-            foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
-            {
+            foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion")) {
                 this.Actions.Add(new GetManaPotion(this, potion));
             }
 
-            foreach (var potion in GameObject.FindGameObjectsWithTag("HealthPotion"))
-            {
+            foreach (var potion in GameObject.FindGameObjectsWithTag("HealthPotion")) {
                 this.Actions.Add(new GetHealthPotion(this, potion));
             }
 
-            foreach (var enemy in Skeletons)
-            {
+            foreach (var enemy in Skeletons) {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
 
-            foreach (var enemy in Orcs)
-            {
+            foreach (var enemy in Orcs) {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
 
-            foreach (var enemy in Dragons)
-            {
+            foreach (var enemy in Dragons) {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new Fireball(this, enemy));
             }
@@ -191,19 +212,24 @@ namespace Assets.Scripts
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
 
 
-            currentNewWorldModelDebug = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
+            //currentNewWorldModelDebug = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
 
-            newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions);
-            debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
+
+            newWorldModel = new NewCurrentStateWorldModel(this.GameManager, this.Actions, chestInfo, enemiesRewards);
+            //debugModel2 = currentNewWorldModelDebug.GenerateChildWorldModel();
+
+            //new SwordAttack(this, GameObject.FindGameObjectsWithTag("Orc")[0]).ApplyActionEffects(debugModel2);
             PreviousTargetName = "";
 
             //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
             //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
-            this.GOAPDecisionMaking = new NewMCTSBiasedPlayout(newWorldModel, chestInfo);
+            this.GOAPDecisionMaking = new NewMCTSBiasedPlayout(newWorldModel, chestInfo, enemiesRewards);
             //this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             //this.GOAPDecisionMaking.InProgress = false;
+
         }
+        
 
         void Update()
         {
@@ -213,8 +239,10 @@ namespace Assets.Scripts
 
                 Debug.Log("Reconsidering");
 
+
+                //currentNewWorldModelDebug.UpdateCurrentStateWorldModel();
                 
-                currentNewWorldModelDebug.UpdateCurrentStateWorldModel();
+                
                 newWorldModel.UpdateCurrentStateWorldModel();
                 
                 //Debug.Log(debugModel2.toString());

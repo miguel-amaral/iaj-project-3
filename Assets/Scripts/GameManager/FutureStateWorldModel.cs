@@ -28,6 +28,7 @@ namespace Assets.Scripts.GameManager
             return new FutureStateWorldModel(this);
         }
 
+
         public override bool IsTerminal()
         {
             int HP = (int)this.GetProperty(Properties.HP);

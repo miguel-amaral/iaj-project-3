@@ -2,12 +2,14 @@
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS;
 
 namespace Assets.Scripts.GameManager {
 
     public class NewWorldModel {
         
         public GameManager gm { get; protected set; }
+        public bool defeat = false;
 
         public bool[] skeletons;
         public bool[] orcs;
@@ -18,8 +20,9 @@ namespace Assets.Scripts.GameManager {
         public Stats stats;
 
         private List<Action> actions;
+        protected List<Action> allActions;
         private int nextAction;
-        private List<Action> availableActions;
+        protected List<Action> availableActions;
 
         public int enemiesAlive;
 
@@ -43,9 +46,36 @@ namespace Assets.Scripts.GameManager {
                     enemiesAlive++;
                 }
             }
-            foreach (var a in actions){
-                if (a.CanExecute(this)) {
-                    availableActions.Add(a);
+
+            BiasedSelection();
+
+            //hack for when we only want one special action -> pick up chest
+            if (availableActions.Count == 0) {
+                foreach (var a in actions) {
+                    if (a.CanExecute(this)) {
+                        availableActions.Add(a);
+                    }
+                }
+            }
+        }
+
+        public virtual void BiasedSelection() {
+            if (enemiesAlive == 0) {
+                int index = 0;
+                foreach (var a in allActions) {
+                    var convert1 = a as GetHealthPotion;
+                    if (convert1 != null) {
+                        actions.RemoveAt(index);
+                        continue;
+                    } else {
+                        var convert2 = a as GetManaPotion;
+                        if (convert2 != null) {
+                            actions.RemoveAt(index);
+                            continue;
+                        } else {
+                            index++;
+                        }
+                    }
                 }
             }
         }
@@ -61,15 +91,15 @@ namespace Assets.Scripts.GameManager {
             //}
             
             this.actions = new List<Action>(actions);
+            this.allActions = new List<Action>(actions);
             this.availableActions = null;
             //this.availableActions = new List<Action>();
             
             //this.stats = new Stats(gm);
         }
 
-        
 
-        public NewWorldModel(NewWorldModel oldWorld) : this(oldWorld.gm, oldWorld.actions) {
+        public NewWorldModel(NewWorldModel oldWorld) : this(oldWorld.gm, oldWorld.allActions) {
             this.skeletons = (bool[]) oldWorld.skeletons.Clone();
             this.orcs = (bool[])oldWorld.orcs.Clone();
             this.dragons = (bool[])oldWorld.dragons.Clone();
@@ -172,6 +202,11 @@ namespace Assets.Scripts.GameManager {
             return toReturn;
         }
 
+        public virtual void FakeGenerateChildWorldModelForPlayout() {
+            this.actions = new List<Action>(allActions);
+            //this.allActions = new List<Action>(actions);
+            this.availableActions = null;
+        }
     }
 
     public class Stats {
