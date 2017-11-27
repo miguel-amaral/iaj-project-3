@@ -7,14 +7,33 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class Fireball : WalkToTargetAndExecuteAction
     {
-        private int xpChange;
-        private int manaChange;
+        protected int xpChange;
+        protected int manaChange;
 
+        private int indexInList;
+        private int worldModelListNr;
 
-		public Fireball(AutonomousCharacter character, GameObject target) : base("Fireball",character,target)
+        public Fireball(AutonomousCharacter character, GameObject target) : base("Fireball",character,target)
 		{
             xmlName = "Fire" + target.name;
             manaChange = 5;
+
+            var s = target.name;
+
+            if (s.StartsWith("Dragon")) {
+                s = s.Substring(6);
+                indexInList = int.Parse(s) - 1;
+                worldModelListNr = 1;
+            } else if (s.StartsWith("Skeleton")) {
+                s = s.Substring(8);
+                indexInList = int.Parse(s) - 1;
+                worldModelListNr = 2;
+            } else if (s.StartsWith("Orc")) {
+                s = s.Substring(3);
+                indexInList = int.Parse(s) - 1;
+                worldModelListNr = 3;
+            }
+
             if (target.tag.Equals("Skeleton"))
 		    {
 		        this.xpChange = 5;
@@ -55,10 +74,28 @@ namespace Assets.Scripts.DecisionMakingActions
             return mana >= 5;
         }
         public override bool CanExecute(NewWorldModel worldModel) {
-            if (!base.CanExecute(worldModel)) return false;
-
+            if (this.Target == null) {
+                return false;
+            }
             var mana = (int)worldModel.stats.getStat(Stats.mn);
-            return mana >= 5;
+            if(mana < 5) {
+                return false;
+            }
+
+            if (this.Target == null) {
+                return false;
+            }else {
+                if (this.worldModelListNr == 1) {
+                    return worldModel.dragons[indexInList];
+                } else if (this.worldModelListNr == 2) {
+                    return worldModel.skeletons[indexInList];
+                } else if (this.worldModelListNr == 3) {
+                    return worldModel.orcs[indexInList];
+                } else {
+                    return false;
+                }
+            }
+
         }
 
 
@@ -96,27 +133,20 @@ namespace Assets.Scripts.DecisionMakingActions
             var hp = worldModel.stats.getStat(Stats.hp);
 
             //disables the target object so that it can't be reused again
-            string s = Target.name;
-            int index;
-            if (s.StartsWith("Dragon")) {
-                //Does not die 
+            if (this.worldModelListNr == 1) { 
+                //Does not die dragon
             } else {
                 var xp = worldModel.stats.getStat(Stats.xp);
                 worldModel.stats.setStat(Stats.xp, worldModel.stats.getStat(Stats.xp) + this.xpChange);
                 var mp = (int)worldModel.stats.getStat(Stats.mn);
                 worldModel.stats.setStat(Stats.mn, mp - manaChange);
 
-                if (s.StartsWith("Skeleton")) {
-                    s = s.Substring(8);
-                    index = int.Parse(s);
-                    worldModel.skeletons[index - 1] = false;
-                    
-                } else if (s.StartsWith("Orc")) {
-                    s = s.Substring(3);
-                    index = int.Parse(s);
-                    worldModel.orcs[index - 1] = false;
+                if (this.worldModelListNr == 2) {
+                    worldModel.skeletons[indexInList] = false;
+                } else if (this.worldModelListNr == 3) {
+                    worldModel.orcs[indexInList] = false;
                 } else {
-                    Debug.Log("Not valid target");
+                    Debug.LogError("Invalid Target Sword Attack");
                 }
             }
             worldModel.SetLastAction(this);

@@ -92,5 +92,21 @@ namespace Assets.Scripts.IAJ.Unity.Pathfinding.Path
         {
 				return param > this.EndParam - MathConstants.EPSILON;
         }
+
+        public float PathLength() {
+            float distance = 0;
+
+            var previousPosition = this.PathPositions[0];
+
+            for (int i = 1; i < this.PathPositions.Count; i++) {
+                var currentPosition = this.PathPositions[i];
+
+                distance += (currentPosition - previousPosition).magnitude;
+
+                previousPosition = currentPosition;
+            }
+
+            return distance;
+        }
     }
 }

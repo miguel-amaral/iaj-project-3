@@ -38,6 +38,7 @@ namespace Assets.Scripts
         public Text BestDiscontentmentText;
         public Text ProcessedActionsText;
         public Text BestActionText;
+        public Text RaveValueText;
         public bool MCTSActive;
 
 
@@ -50,6 +51,8 @@ namespace Assets.Scripts
         public Action CurrentAction { get; private set; }
         public DynamicCharacter Character { get; private set; }
         public DecisionMakingBase GOAPDecisionMaking { get; set; }
+
+        public int NumberDivisions = 0;
 
         public AStarPathfinding AStarPathFinding;
         private PathSmoothing pathSmoothing = new PathSmoothing();
@@ -298,13 +301,15 @@ namespace Assets.Scripts
                     this.currentSmoothedSolution = this.currentSolution;
 
                     var smoother = new PathSmoothing();
-                    this.currentSmoothedSolution = smoother.Smooth(this.Character.KinematicData.position, this.currentSolution);
+                    this.currentSmoothedSolution = smoother.Smooth(this.currentSolution);
                     this.currentSmoothedSolution.CalculateLocalPathsFromPathPositions(this.Character.KinematicData.position);
+                    var maxSpeed = 50.0f;
 					this.Character.Movement = new DynamicFollowPath(this.Character.KinematicData, this.currentSmoothedSolution)
                     {
                         MaxAcceleration = 200.0f,
-                        MaxSpeed = 40.0f
+                        MaxSpeed = maxSpeed
                     };
+                    this.Character.MaxSpeed = maxSpeed;
                 }
             }
 
@@ -353,6 +358,8 @@ namespace Assets.Scripts
                 //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
                 //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;
 
+                this.RaveValueText.text = "Divisions: " + GOAPDecisionMaking.NumberDivisionSelection + " : " + GOAPDecisionMaking.NumberDivisionBackpropagate;
+
                 if (this.GOAPDecisionMaking.BestAction != null) {
                     var actionText = "";
                     foreach (var action in this.GOAPDecisionMaking.BestActionSequence) {
@@ -376,11 +383,9 @@ namespace Assets.Scripts
             var targetPosition = target.transform.position;
             if (!this.PreviousTargetPosition.Equals(targetPosition) || this.GameManager.WorldChanged)
             {
-                Debug.Log("Entrei start pathfinding if");
                 this.AStarPathFinding.InitializePathfindingSearch(this.Character.KinematicData.position, targetPosition);
                     PreviousTargetPosition = targetPosition;
                 PreviousTargetName = target.name;
-                Debug.Log(PreviousTargetPosition +"\n" + PreviousTargetName);
             }
         }
 

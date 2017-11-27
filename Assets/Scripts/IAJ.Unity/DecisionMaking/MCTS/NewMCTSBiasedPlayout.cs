@@ -51,62 +51,72 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
 
                 var sum = 5;
                 //if(executableAction)
-                if (executableAction.Name.Contains("Chest")) {
-                    var chestAction = executableAction as PickUpChest;
+                //if (executableAction.Name.Contains("Chest")) {
+                //    var chestAction = executableAction as PickUpChest;
 
-                    List<string> value;
-                    if (!chestInfo.TryGetValue(chestAction.Target.name, out value)) {
-                        Debug.Log("This shouldn't happen, bias");
-                        return null;
-                    }
-                    var chestposition = chestAction.Target.transform.position;
-                    var alone = true;
-                    foreach(var enemy in value) {
-                        var s = enemy;
-                        //Debug.Log(s);
-                        int index;
-                        var worldModel = currentPlayoutState;
-                        bool alive = true;
-                        if (s.StartsWith("Dragon")) {
-                            s = s.Substring(6);
-                            index = int.Parse(s);
-                            alive = worldModel.dragons[index - 1];
-                        } else if (s.StartsWith("Skeleton")) {
-                            s = s.Substring(8);
-                            index = int.Parse(s);
-                            alive = worldModel.skeletons[index - 1];
-                        } else if (s.StartsWith("Orc")) {
-                            s = s.Substring(3);
-                            index = int.Parse(s);
-                            alive = worldModel.orcs[index - 1];
-                        } else {
-                            Debug.Log("Not valid target");
-                        }
-                        if (alive) {
-                            alone = false;
-                        }
-                    }
-                    
-                    if (alone) {
-                        //Debug.Log("Entrei aqui");
-                        return executableAction;
-                    }
+                //    List<string> value;
+                //    if (!chestInfo.TryGetValue(chestAction.Target.name, out value)) {
+                //        Debug.Log("This shouldn't happen, bias");
+                //        return null;
+                //    }
+                //    var chestposition = chestAction.Target.transform.position;
+                //    var alone = true;
+                //    foreach(var enemy in value) {
+                //        var s = enemy;
+                //        //Debug.Log(s);
+                //        int index;
+                //        var worldModel = currentPlayoutState;
+                //        bool alive = true;
+                //        if (s.StartsWith("Dragon")) {
+                //            s = s.Substring(6);
+                //            index = int.Parse(s);
+                //            alive = worldModel.dragons[index - 1];
+                //        } else if (s.StartsWith("Skeleton")) {
+                //            s = s.Substring(8);
+                //            index = int.Parse(s);
+                //            alive = worldModel.skeletons[index - 1];
+                //        } else if (s.StartsWith("Orc")) {
+                //            s = s.Substring(3);
+                //            index = int.Parse(s);
+                //            alive = worldModel.orcs[index - 1];
+                //        } else {
+                //            Debug.Log("Not valid target");
+                //        }
+                //        if (alive) {
+                //            alone = false;
+                //        }
+                //    }
+
+                //    if (alone) {
+                //        //Debug.Log("Entrei aqui");
+                //        return executableAction;
+                //    }
+                //}
+
+                var level = executableAction as LevelUp;
+                if (level != null) {
+                    return executableAction;
                 }
 
                 if (enemiesNumber == 0) {
-                    if ((executableAction.Name.StartsWith("GetHealthPotion") || executableAction.Name.StartsWith("GetManaPotion"))) {
+                    var hpAction = executableAction as GetHealthPotion;
+                    var mpAction = executableAction as GetManaPotion;
+                    if(hpAction != null || mpAction != null) {
                         continue;
                     }
                 } else if (mana > 5) {
-                    if (executableAction.Name.StartsWith("Fire")) {
+                    var fireAction = executableAction as Fireball;
+                    if (fireAction != null) {
                         sum += 40;
                     }
                 }
-                if (lvl < 3 && executableAction.Name.Contains("Dragon")) {
-                    continue;
-                }
+                
+                //if (lvl < 3 && executableAction.Name.Contains("Dragon")) {
+                //    continue;
+                //}
 
-                if (hp <= 5 && executableAction.Name.StartsWith("Sword")) {
+                var swordAction = executableAction as SwordAttack;
+                if (hp<=5 && swordAction != null) {
                     continue;
                 }
                 //private bool CheckRange(GameObject obj, float maximumSqrDistance) {

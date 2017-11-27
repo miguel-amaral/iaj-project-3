@@ -39,40 +39,36 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override float GetDuration(NewWorldModel worldModel) {
             var position = worldModel.stats.getPosition();
-            return this.GetDuration(position);
+            return this.GetDuration(position,worldModel.GetLastAction());
+        }
+
+        private float GetDuration(Vector3 currentPosition, Action action) {
+            string targetName;
+            if(action == null) {
+                targetName = "Character";
+            } else {
+                var walkToTargetAndExecuteAction = action as WalkToTargetAndExecuteAction;
+                if (walkToTargetAndExecuteAction == null) {
+                    return 0;
+                }
+                targetName = walkToTargetAndExecuteAction.Target.name;
+            }
+
+            float distance;
+            var heuristic = OfflineTableHeuristic.Instance;
+
+            if (heuristic.GotEntry(targetName, Target.gameObject.name)) {
+                distance = heuristic.H(targetName, Target.gameObject.name);
+            } else {
+                distance = (this.Target.transform.position - currentPosition).magnitude;
+            }
+            return distance / this.Character.Character.MaxSpeed;
         }
 
         private float GetDuration(Vector3 currentPosition)
         {
-            float distance;
-            var heuristic = OfflineTableHeuristic.Instance;
-
-            if (heuristic.GotEntry(Character.PreviousTargetName, Target.gameObject.name))
-            {
-                distance = heuristic.H(Character.PreviousTargetName, Target.gameObject.name);
-            }
-            else
-            {
-                distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-            }
+            float distance = (this.Target.transform.position - currentPosition).magnitude;
             return distance / this.Character.Character.MaxSpeed;
-            //if ((closestObjectName = GetClosestObjectName(this.Character)) != null)
-            //{
-            //Debug.Log("Using offline heuristic!");
-            //try
-            //{
-            //    distance = OfflineTableHeuristic.Instance.H(Character.PreviousTargetName, Target.gameObject.name);
-            //}
-            //catch (KeyNotFoundException)
-            //{
-            //Debug.Log("Ups! Using Ecli! PrevTargetName: " + Character.PreviousTargetName);
-            //distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-               // }
-       //     }
-       //     else
-       //     {
-			    //distance = (this.Target.transform.position - this.Character.Character.KinematicData.position).magnitude;
-       //     }
         }
 
         
@@ -122,6 +118,8 @@ namespace Assets.Scripts.DecisionMakingActions
         }
 
         public override bool CanExecute(NewWorldModel worldModel) {
+            Debug.LogError("xD");
+
             if (this.Target == null) {
                 //Debug.Log("xD");
                 return false;
@@ -158,7 +156,7 @@ namespace Assets.Scripts.DecisionMakingActions
                 Debug.Log("Not valid target");
                 return false;
             }
-                return false;
+            return false;
         }
 
         public override void Execute()
@@ -169,6 +167,7 @@ namespace Assets.Scripts.DecisionMakingActions
 
         public override void ApplyActionEffects(WorldModel worldModel)
         {
+            worldModel.SetProperty(Properties.POSITION, Target.transform.position);
             var duration = this.GetDuration(worldModel);
 
             var quicknessValue = worldModel.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
@@ -177,10 +176,11 @@ namespace Assets.Scripts.DecisionMakingActions
             var time = (float)worldModel.GetProperty(Properties.TIME);
             worldModel.SetProperty(Properties.TIME, time + duration);
 
-            worldModel.SetProperty(Properties.POSITION, Target.transform.position);
         }
 
         public override void ApplyActionEffects(NewWorldModel worldModel) {
+            worldModel.stats.setPosition(Target.transform.position);
+
             var duration = this.GetDuration(worldModel);
 
             //var quicknessValue = worldModel.GetGoalValue(AutonomousCharacter.BE_QUICK_GOAL);
@@ -190,7 +190,8 @@ namespace Assets.Scripts.DecisionMakingActions
             //var time = (float)worldModel.GetProperty(Properties.TIME);
             worldModel.stats.setTime(worldModel.stats.getTime()+duration);
             //worldModel.SetProperty(Properties.TIME, time + duration);
-            worldModel.stats.setPosition(Target.transform.position);
+
+            //Debug.Log(time + " -> " + worldModel.stats.getTime());
             //worldModel.SetProperty(Properties.POSITION, Target.transform.position);
             
         }

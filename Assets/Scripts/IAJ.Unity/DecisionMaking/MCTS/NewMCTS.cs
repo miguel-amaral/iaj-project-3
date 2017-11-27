@@ -10,14 +10,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class NewMCTS : DecisionMakingBase
     {
-        public const float C = 1.4f * 250;
+        public const float C = 1.4f;// * 525;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
-
+        public int NumberDivisionSelection { get; private set; }
+        public int NumberDivisionBackpropagate { get; private set; }
+        
         public float PlayoutNodes { get; private set; }
 
         public float ParcialProcessingTime { get; private set; }
@@ -40,7 +42,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
             this.MaxIterations = 10000;
-            this.MaxIterationsProcessedPerFrame = 100;
+            this.MaxIterationsProcessedPerFrame = 400;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
 
@@ -61,7 +63,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.CurrentIterations = 0;
             this.CurrentIterationsInFrame = 0;
             this.CurrentStateWorldModel.Initialize();
-            this.InitialNode = new NewMCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel())
+            this.InitialNode = new NewMCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel(),0)
             {
                 Action = null,
                 Parent = null,
@@ -138,17 +140,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (nextAction != null) {
                     return Expand(currentNode, nextAction);
                 } else {
-                    
-                    if (currentNode.ChildNodes.Count == 0) {
-                        //DEBUG CODE
-                        string xmlTree = initialNode.ToXML(0);
-                        int numero = initialNode.RecursiveNumberOfChilds();
-                        System.IO.File.WriteAllText(@"C:\treeXml\tree.xml", xmlTree);
-                        Debug.Log("Escrita Arvore");
-                        Debug.Log("Arvore nos : " + numero);
-                    } else {
-                        currentNode = BestUCTChild(currentNode);
-                    }
+                    currentNode = BestUCTChild(currentNode);
                 }
             }
 
@@ -190,6 +182,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             while(node != null) {
                 node.N++;
                 node.Q += reward.Value;
+                node.RecalculateUTC();
+                //NumberDivisionBackpropagate++;
                 node = node.Parent;
             }
         }
@@ -199,7 +193,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             NewWorldModel childModel = parent.State.GenerateChildWorldModel();
             action.ApplyActionEffects(childModel);
             childModel.CalculateNextPlayer();
-            NewMCTSNode child = new NewMCTSNode(childModel) {
+
+            //size before insert
+            var childIndex = parent.ChildNodes.Count;
+            NewMCTSNode child = new NewMCTSNode(childModel,childIndex) {
                 Parent = parent,
                 PlayerID = childModel.GetNextPlayer(),
                 Action = action,
@@ -207,6 +204,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 Q = 0f,
             };
             parent.ChildNodes.Add(child);
+            parent.bestNodesSorted.Insert(childIndex, new Pair<int, double>(childIndex, double.MinValue));
             return child;          
         }
 
@@ -215,17 +213,36 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             NewMCTSNode best = null;
             var bestUCT = double.MinValue;
+            int index = 0;
+            int bestIndex = 0;
             foreach (var nodeChildNode in node.ChildNodes)
             {
-                var firstPart = nodeChildNode.Q / nodeChildNode.N;
-                var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
-                var sum = firstPart + secondPart;
+            
+                //this.NumberDivisionSelection++;
+                //var firstPart = nodeChildNode.Q / nodeChildNode.N;
+                //var secondPart = C * Math.Sqrt(Math.Log(nodeChildNode.Parent.N) / nodeChildNode.N);
+                var sum = nodeChildNode.utcValue;//firstPart + secondPart;
                 if (sum > bestUCT)
                 {
                     bestUCT = sum;
                     best = nodeChildNode;
+                    bestIndex = index;
                 }
+                index++;
             }
+
+            ////int bestChildIndex = node.bestNodesSorted[0].First;
+            ////best = node.ChildNodes[bestChildIndex];
+
+
+            //if (pair.First != bestIndex) {
+            //    Debug.LogError("Assertion Failed pair.First != bestIndex");
+            //}
+            //if (pair.Second  != bestUCT) {
+            //    Debug.LogError("Assertion Failed pair.Second != bestUCT");
+            //}
+            
+
             return best;
         }
 
@@ -245,6 +262,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     bestUCT = firstPart;
                     best = nodeChildNode;
                 }
+                //else if(Math.Abs(bestUCT -firstPart) < 0.001) {
+                //    Debug.Log("Muito parecido"); 
+                //}
             }
             return best;
         }

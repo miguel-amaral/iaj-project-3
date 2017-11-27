@@ -59,8 +59,8 @@ namespace Assets.Resources.Editor
                             "Calculating distance for each object", percentage);
                     }
 
-                    if (ourGameObject.Equals(otherOurGameObject))
-                    {
+                    if (ourGameObject.name.Equals(otherOurGameObject.name)) {
+                        table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
                         continue;
                     }
 
@@ -68,13 +68,14 @@ namespace Assets.Resources.Editor
                         otherOurGameObject.transform.position);
                     GlobalPath solution;
                     goalBoundingPathfinding.Search(out solution);
-                    solution = pathsmoother.Smooth(ourGameObject.transform.position, solution);
-                    table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), solution.Length);
+                    solution = pathsmoother.Smooth(solution);
+                    table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), solution.PathLength());
                     goalBoundingPathfinding.CleanUp();
                 }
             }
             OfflineTableHeuristic.SaveTable(table);
             EditorUtility.ClearProgressBar();
+
         }
 
 
@@ -86,7 +87,8 @@ namespace Assets.Resources.Editor
             var orcs = GameObject.FindGameObjectsWithTag("Orc");
             var skeletons = GameObject.FindGameObjectsWithTag("Skeleton");
             var dragons = GameObject.FindGameObjectsWithTag("Dragon");
-            return hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons);
+            var player = GameObject.FindGameObjectsWithTag("Player");
+            return hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons).Concat(player);
         }
     }
 }

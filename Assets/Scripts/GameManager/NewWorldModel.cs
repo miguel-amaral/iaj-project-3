@@ -28,11 +28,23 @@ namespace Assets.Scripts.GameManager {
             this.enemiesAlive = 0;
             availableActions = new List<Action>();
 
-            foreach(var a in actions){
+            foreach(var boolito in skeletons) {
+                if(boolito) {
+                    enemiesAlive++;
+                }
+            }
+            foreach (var boolito in dragons) {
+                if (boolito) {
+                    enemiesAlive++;
+                }
+            }
+            foreach (var boolito in orcs) {
+                if (boolito) {
+                    enemiesAlive++;
+                }
+            }
+            foreach (var a in actions){
                 if (a.CanExecute(this)) {
-                    if (a.Name.Contains("Sword")) {
-                        enemiesAlive++;
-                    }
                     availableActions.Add(a);
                 }
             }
@@ -108,7 +120,10 @@ namespace Assets.Scripts.GameManager {
 
         public virtual void CalculateNextPlayer() {
         }
-
+        public virtual Action GetLastAction() {
+            //feio quie doi 
+            return null;
+        }
         public virtual void SetLastAction(Action action) {
 
         }

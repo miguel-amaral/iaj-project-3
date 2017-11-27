@@ -9,7 +9,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         bool InProgress { get; }
         float TotalProcessingTime { get; }
         float ParcialProcessingTime { get; }
-
+        int NumberDivisionSelection { get; }
+        int NumberDivisionBackpropagate { get; }
+        
         GOB.Action BestAction { get; }
 
         Action ChooseAction();

@@ -45,12 +45,13 @@ namespace Assets.Scripts.GameManager {
             int hp = this.stats.getStat(Stats.hp);
             float time = this.stats.getTime();
 
-            if (money == 25 && hp > 0) {
-                //Debug.Log("Ganhei");
-                return 125 + 200 + 200 - (time > 200 ? 200 : time); //0.5f + 0.0025f * (200 -time);
+            var maxTime = 125 + 400;
+
+            if (money == 25 && hp > 0 && time < 200) {
+                return (125 + 400 - time*2)/maxTime; //0.5f + 0.0025f * (200 -time);
 
             } else {
-                return money;
+                return money/maxTime;
             }
         }
 
@@ -61,13 +62,22 @@ namespace Assets.Scripts.GameManager {
             }
         }
 
-        public Action GetLastAction() {
+        public override Action GetLastAction() {
             return this.LastAction;
         }
 
         public override void SetLastAction(Action action) {
             this.LastAction = action;
         }
+
+
+        //public Action GetLastTarget() {
+        //    return this.LastTarget;
+        //}
+
+        //public override void SetLastTarget(GameObject target) {
+        //    this.LastTarget = target;
+        //}
 
         public override int GetNextPlayer() {
             return this.NextPlayer;
@@ -89,15 +99,16 @@ namespace Assets.Scripts.GameManager {
                 var worldModel = this;
                 bool enabledOnArray = false;
 
-                if (s.StartsWith("Dragon")) {
+                
+                if (enemy.CompareTag("Dragon")) {
                     s = s.Substring(6);
                     index = int.Parse(s);
                     enabledOnArray = worldModel.dragons[index - 1];
-                } else if (s.StartsWith("Skeleton")) {
+                } else if (enemy.CompareTag("Skeleton")) {
                     s = s.Substring(8);
                     index = int.Parse(s);
                     enabledOnArray = worldModel.skeletons[index - 1];
-                } else if (s.StartsWith("Orc")) {
+                } else if (enemy.CompareTag("Orc")) {
                     s = s.Substring(3);
                     index = int.Parse(s);
                     enabledOnArray = worldModel.orcs[index - 1];

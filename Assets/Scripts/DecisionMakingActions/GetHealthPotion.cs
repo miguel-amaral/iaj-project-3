@@ -7,10 +7,14 @@ namespace Assets.Scripts.DecisionMakingActions
 {
     public class GetHealthPotion : WalkToTargetAndExecuteAction
     {
+        private int indexInList;
+        
         public GetHealthPotion(AutonomousCharacter character, GameObject target) : base("GetHealthPotion",character,target)
         {
             xmlName = target.name;
-
+            var s = this.Target.name;
+            s = s.Substring(12);
+            indexInList = int.Parse(s) -1;
         }
 
         public override bool CanExecute()
@@ -28,11 +32,21 @@ namespace Assets.Scripts.DecisionMakingActions
         }
 
         public override bool CanExecute(NewWorldModel worldModel) {
-            if (!base.CanExecute(worldModel)) return false;
-
+            if (this.Target == null) {
+                return false;
+            }
             var hp = worldModel.stats.getStat(Stats.hp);
 
-            return hp < worldModel.stats.getStat(Stats.maxhp);
+            if (hp >= worldModel.stats.getStat(Stats.maxhp)) {
+                return false;
+            }
+
+
+            return worldModel.healthPots[indexInList];
+
+
+
+
         }
 
 
@@ -55,10 +69,8 @@ namespace Assets.Scripts.DecisionMakingActions
 
             worldModel.stats.setStat(Stats.hp, worldModel.stats.getStat(Stats.maxhp));
             //disables the target object so that it can't be reused again
-            var s = this.Target.name;
-            s = s.Substring(12);
-            var index = int.Parse(s);
-            worldModel.healthPots[index - 1] = false;
+
+            worldModel.healthPots[indexInList] = false;
             worldModel.SetLastAction(this);
         }
 
