@@ -202,7 +202,8 @@ namespace Assets.Scripts.GameManager {
             return toReturn;
         }
 
-        public virtual void FakeGenerateChildWorldModelForPlayout() {
+        public virtual void FakeGenerateForPlayout() {
+            //this.GenerateChildWorldModel();
             this.actions = new List<Action>(allActions);
             //this.allActions = new List<Action>(actions);
             this.availableActions = null;

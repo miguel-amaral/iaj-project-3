@@ -340,7 +340,7 @@ namespace Assets.Scripts
             //call the pathfinding method if the user specified a new goal
             if (this.AStarPathFinding.InProgress)
             {
-                Debug.Log("AStar In Progress");
+                //Debug.Log("AStar In Progress");
                 var finished = this.AStarPathFinding.Search(out this.currentSolution);
                 if (finished && this.currentSolution != null)
                 {

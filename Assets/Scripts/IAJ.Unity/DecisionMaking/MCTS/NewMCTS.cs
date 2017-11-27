@@ -40,7 +40,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 30000;
+            this.MaxIterations = 10000;
             this.MaxIterationsProcessedPerFrame = 400;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
@@ -170,7 +170,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         Value = currentPlayoutState.GetScore()
                     };
                 }
-                childModel.FakeGenerateChildWorldModelForPlayout();
+                childModel.FakeGenerateForPlayout();
                 action.ApplyActionEffects(childModel);
                 childModel.CalculateNextPlayer();
                 currentPlayoutState = childModel;
