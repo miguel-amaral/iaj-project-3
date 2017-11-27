@@ -46,7 +46,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var lvl = (int)currentPlayoutState.GetProperty(Properties.LEVEL);
             var position = (Vector3)currentPlayoutState.GetProperty(Properties.POSITION);
 
-            foreach (var executableAction in currentPlayoutState.GetExecutableActions())
+            var AvailableActions = currentPlayoutState.GetExecutableActions();
+
+            this.TotalPlayoutNodes += AvailableActions.Length;
+
+            
+
+            foreach (var executableAction in AvailableActions)
             {
                 //apply to get next state and check who is next player (maybe)
                 //trully fucking expensive    
@@ -87,6 +93,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (bestOverallAction.Count == 0) {
                 return null;
             }
+
+            //this.PlayoutNodes += bestOverallAction.Count;
+
             var bestValue = this.RandomGenerator.Next(weights[weights.Count - 1]);
             for(int i =0; i< weights.Count; i++) {
                 if (bestValue < weights[i]) {

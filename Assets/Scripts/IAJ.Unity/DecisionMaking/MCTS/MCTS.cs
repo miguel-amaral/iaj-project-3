@@ -18,7 +18,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
 
-        public float PlayoutNodes { get; private set; }
+        public int PlayoutNodes { get; protected set; }
+        public int TotalPlayoutNodes { get; protected set; }
 
         public float ParcialProcessingTime { get; private set; }
         
@@ -39,12 +40,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 10000;
-            this.MaxIterationsProcessedPerFrame = 100;
+            this.MaxIterations = 30000;
+            this.MaxIterationsProcessedPerFrame = 400;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
 
             this.PlayoutNodes = 0;
+            this.TotalPlayoutNodes = 0;
         }
 
 
@@ -100,7 +102,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (CurrentIterations >= MaxIterations)
             {
                 InProgress = false;
-                printXMLTree(rootNode);
+                //printXMLTree(rootNode);
 
                 List<GOB.Action> temp = new List<GOB.Action>();
                 var currNode = rootNode;
@@ -156,7 +158,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(WorldModel currentPlayoutState) {
             while (!currentPlayoutState.IsTerminal()) {
-                this.PlayoutNodes++;
+                //this.PlayoutNodes++;
                 var action = GuidedAction(currentPlayoutState);
                 if(action == null) {
                     return new Reward {
@@ -179,6 +181,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected virtual Action GuidedAction(WorldModel currentPlayoutState)
         {
             var possibleActions = currentPlayoutState.GetExecutableActions();
+
+            var lenght = possibleActions.Length;
+
+            this.TotalPlayoutNodes += lenght;
+            this.PlayoutNodes += lenght;
 
             var number = RandomGenerator.Next(possibleActions.Length);
             return possibleActions[number];

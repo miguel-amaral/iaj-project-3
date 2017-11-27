@@ -46,10 +46,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
             var position = currentPlayoutState.stats.getPosition();
 
             //var enemiesNumber = currentPlayoutState.enemiesAlive;
-            
 
+            var possibleActions = currentPlayoutState.GetExecutableActions();
+            //this.TotalPlayoutNodes += possibleActions.Length;
             //var goodChest = false;
-            foreach (var executableAction in currentPlayoutState.GetExecutableActions()) {
+            foreach (var executableAction in possibleActions) {
 
 
                 var sum = 5;
@@ -100,6 +101,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
 
                 var level = executableAction as LevelUp;
                 if (level != null) {
+                    this.ActionsCut += possibleActions.Length - 1;
                     return executableAction;
                 }
 
@@ -139,8 +141,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS {
 
             }
             if (bestOverallAction.Count == 0) {
+                this.ActionsCut += possibleActions.Length;
                 return null;
             }
+            this.ActionsCut += possibleActions.Length- bestOverallAction.Count;
             var bestValue = this.RandomGenerator.Next(weights[weights.Count - 1]);
             for (int i = 0; i < weights.Count; i++) {
                 if (bestValue < weights[i]) {

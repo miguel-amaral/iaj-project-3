@@ -75,6 +75,7 @@ namespace Assets.Scripts
         private NewCurrentStateWorldModel currentNewWorldModelDebug;
         private NewCurrentStateWorldModel newWorldModel;
         private NewWorldModel debugModel2;
+        private float TotalTime;
 
         public void Initialize(NavMeshPathGraph navMeshGraph, AStarPathfinding pathfindingAlgorithm)
         {
@@ -222,6 +223,8 @@ namespace Assets.Scripts
             PreviousTargetName = "";
 
             //this.GOAPDecisionMaking = new MCTSBiasedPlayout(worldModel);
+            //this.GOAPDecisionMaking = new MCTSBiasedPlayout(newWorldModel);
+            
             //this.GOAPDecisionMaking = new MCTS(worldModel);
             //this.GOAPDecisionMaking = new NewMCTS(newWorldModel);
             this.GOAPDecisionMaking = new NewMCTSBiasedPlayout(newWorldModel, chestInfo, enemiesRewards);
@@ -233,10 +236,33 @@ namespace Assets.Scripts
 
         void Update()
         {
+            //var bgTime = Time.realtimeSinceStartup;
            
             if (Time.time > this.nextUpdateTime || this.GameManager.WorldChanged)
             {
+                //Debug.Log(this.TotalTime);
 
+                if (this.GameManager.characterData.HP <= 0 || this.GameManager.characterData.Time >= 200) {
+                    Debug.Log("Lost");
+                    Debug.Log(this.GameManager.characterData.Time);
+                    Debug.Log("Total: " + this.GOAPDecisionMaking.TotalProcessingTime);
+                    var mctsLog = this.GOAPDecisionMaking as NewMCTS;
+                    if (mctsLog != null) {
+                        Debug.Log("ActionsCut: " + mctsLog.ActionsCut);
+                    }
+                    this.GameManager.WorldChanged = false;
+                    this.nextUpdateTime = float.MaxValue;
+                } else if (this.GameManager.characterData.Money == 25) {
+                    Debug.Log("Victory");
+                    Debug.Log(this.GameManager.characterData.Time);
+                    Debug.Log("Total: " + this.GOAPDecisionMaking.TotalProcessingTime);
+                    var mctsLog = this.GOAPDecisionMaking as NewMCTS;
+                    if (mctsLog != null) {
+                        Debug.Log("ActionsCut: " + mctsLog.ActionsCut);
+                    }
+                    this.GameManager.WorldChanged = false;
+                    this.nextUpdateTime = float.MaxValue;
+                }
                 Debug.Log("Reconsidering");
 
 
@@ -349,6 +375,9 @@ namespace Assets.Scripts
 			{
 				this.characterAnimator.SetBool ("Walking", false);
 			}
+
+            //var endtime = Time.realtimeSinceStartup;
+            //this.TotalTime += endtime - bgTime;
         }
 
         
@@ -378,7 +407,10 @@ namespace Assets.Scripts
 
                 var mcts = this.GOAPDecisionMaking as MCTS;
                 if (mcts != null) {
-                    this.TotalProcessingTimeText.text += "\nPlayouts: "+ mcts.PlayoutNodes;
+                    //this.TotalProcessingTimeText.text += "\nActions Cut: " + mcts.PlayoutNodes;// + ": "+ mcts.TotalPlayoutNodes ;
+                } else {
+                    var newmcts = this.GOAPDecisionMaking as NewMCTS;
+                    this.TotalProcessingTimeText.text += "\nActions Cut: " + newmcts.ActionsCut;// + ": " + newmcts.TotalPlayoutNodes;
                 }
                 //this.BestDiscontentmentText.text = "Best Discontentment: " + this.GOAPDecisionMaking.BestDiscontentmentValue.ToString("F");
                 //this.ProcessedActionsText.text = "Act. comb. processed: " + this.GOAPDecisionMaking.TotalActionCombinationsProcessed;

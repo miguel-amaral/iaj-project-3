@@ -18,7 +18,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public int MaxSelectionDepthReached { get; private set; }
         public float TotalProcessingTime { get; private set; }
 
-        public float PlayoutNodes { get; private set; }
+        public float ActionsCut { get; protected set; }
+        public float TotalPlayoutNodes { get; protected set; }
 
         public float ParcialProcessingTime { get; private set; }
         
@@ -39,12 +40,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 50000;
+            this.MaxIterations = 30000;
             this.MaxIterationsProcessedPerFrame = 400;
             this.RandomGenerator = new System.Random();
             this.TotalProcessingTime = 0;
 
-            this.PlayoutNodes = 0;
+            this.ActionsCut = 0;
+            this.TotalPlayoutNodes = 0;
         }
 
 
@@ -158,8 +160,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         private Reward Playout(NewWorldModel currentPlayoutState) {
             var childModel = currentPlayoutState.GenerateChildWorldModel();
+            //this.TotalPlayoutNodes++;
             while (!currentPlayoutState.IsTerminal()) {
-                this.PlayoutNodes++;
+                
                 var action = GuidedAction(currentPlayoutState);
                 if(action == null) {
                     return new Reward {
@@ -182,6 +185,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         protected virtual Action GuidedAction(NewWorldModel currentPlayoutState)
         {
             var possibleActions = currentPlayoutState.GetExecutableActions();
+
+            var length = possibleActions.Length;
+            //this.TotalPlayoutNodes += length;
+            //this.PlayoutNodes += length;
 
             var number = RandomGenerator.Next(possibleActions.Length);
             return possibleActions[number];
