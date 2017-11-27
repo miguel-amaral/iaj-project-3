@@ -1,27 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading;
 using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.GoalBounding;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Heuristics;
 using Assets.Scripts.IAJ.Unity.Pathfinding.Path;
 using Assets.Scripts.IAJ.Unity.Utils;
-using RAIN.Navigation;
-using RAIN.Navigation.Graph;
 using RAIN.Navigation.NavMesh;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 //using Assets.Scripts.IAJ.Unity.Pathfinding.DataStructures.HPStructures;
 
-namespace Assets.Resources.Editor
+namespace Assets.Editor
 {
-    public class IajMenuHeuristic 
+    public class IajMenuHeuristic
     {
         [MenuItem("IAJ/Heuristic Calculation")]
         public static void CalculateHeuristic()
@@ -30,15 +22,15 @@ namespace Assets.Resources.Editor
             var goalBoundTable = ScriptableObject.CreateInstance<GoalBoundingTable>();
             goalBoundTable.LoadOptimized();
 
-            //EditorSceneManager.OpenScene("Assets/Scenes/dungeon.unity");
-            //EditorApplication.ExecuteMenuItem("Edit/Play");
+            //get the NavMeshGraph from the current scene
+            NavMeshPathGraph navMesh = GameObject.Find("Navigation Mesh").GetComponent<NavMeshRig>().NavMesh.Graph;
 
-            //while (UnityEditor.EditorApplication.isPlaying == false)
-            //{
-            //}
+            //this is needed because RAIN AI does some initialization the first time the QuantizeToNode method is called
+            //if this method is not called, the connections in the navigationgraph are not properly initialized
+            navMesh.QuantizeToNode(new Vector3(0, 0, 0), 1.0f);
 
-            GoalBoundingPathfinding goalBoundingPathfinding = 
-                new GoalBoundingPathfinding(NavigationManager.Instance.NavMeshGraphs[0], new EuclidianHeuristic(), goalBoundTable);
+            GoalBoundingPathfinding goalBoundingPathfinding =
+                new GoalBoundingPathfinding(navMesh, new EuclidianHeuristic(), goalBoundTable);
 
             var pathsmoother = new PathSmoothing();
 
@@ -55,26 +47,28 @@ namespace Assets.Resources.Editor
                     {
                         float percentage = (float)progress / (float)(2 * ourGameObjects.Count());
 
-                        EditorUtility.DisplayProgressBar("Heuristic precomputation progress", 
+                        EditorUtility.DisplayProgressBar("Heuristic precomputation progress",
                             "Calculating distance for each object", percentage);
                     }
 
-                    if (ourGameObject.name.Equals(otherOurGameObject.name)) {
+                    if (ourGameObject.name.Equals(otherOurGameObject.name))
+                    {
                         table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), 0);
                         continue;
                     }
-                    goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position, 
+
+                    goalBoundingPathfinding.InitializePathfindingSearch(ourGameObject.transform.position,
                         otherOurGameObject.transform.position);
                     GlobalPath solution;
                     goalBoundingPathfinding.Search(out solution);
-                    // solution = pathsmoother.Smooth(solution);
+                    solution = pathsmoother.Smooth(solution);
                     table.Add(new Pair<string, string>(ourGameObject.name, otherOurGameObject.name), solution.PathLength());
                     goalBoundingPathfinding.CleanUp();
                 }
             }
             OfflineTableHeuristic.SaveTable(table);
             EditorUtility.ClearProgressBar();
-           // Application.6();
+
         }
 
 
@@ -88,18 +82,6 @@ namespace Assets.Resources.Editor
             var dragons = GameObject.FindGameObjectsWithTag("Dragon");
             var player = GameObject.FindGameObjectsWithTag("Player");
             return hPots.Concat(mPots).Concat(chests).Concat(orcs).Concat(skeletons).Concat(dragons).Concat(player);
-        }
-
-
-        private static List<NavigationGraphNode> GetNodesHack(NavMeshPathGraph graph)
-        {
-            //this hack is needed because in order to implement NodeArrayA* you need to have full acess to all the nodes in the navigation graph in the beginning of the search
-            //unfortunately in RAINNavigationGraph class the field which contains the full List of Nodes is private
-            //I cannot change the field to public, however there is a trick in C#. If you know the name of the field, you can access it using reflection (even if it is private)
-            //using reflection is not very efficient, but it is ok because this is only called once in the creation of the class
-            //by the way, NavMeshPathGraph is a derived class from RAINNavigationGraph class and the _pathNodes field is defined in the base class,
-            //that's why we're using the type of the base class in the reflection call
-            return (List<NavigationGraphNode>)Assets.Scripts.IAJ.Unity.Utils.Reflection.GetInstanceField(typeof(RAINNavigationGraph), graph, "_pathNodes");
         }
     }
 }
